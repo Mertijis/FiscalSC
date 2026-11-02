@@ -1,0 +1,46 @@
+meta {
+  name: 03 - Form Despesa Orçamentária (Metadados SPA)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/rest/florianopolis/dadosAbertos/despesaOrcamentaria/form?entidade={{entidade}}
+  body: json
+  auth: none
+}
+
+params:query {
+  entidade: {{entidade}}
+}
+
+headers {
+  Content-Type: application/json;charset=UTF-8
+  Accept: application/json, text/plain, */*
+}
+
+body:json {
+  {
+    "mode": "INFO"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.pojo: isDefined
+}
+
+tests {
+  test("Status deve ser 200 (OK)", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Deve retornar metadados da rota com URL e método documentados", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.pojo).to.be.an('object');
+    expect(body.pojo.option).to.equal('despesaOrcamentaria');
+    expect(body.pojo.metodo).to.equal('GET');
+    expect(body.pojo.url).to.include('/api/v1/despesaOrcamentaria');
+  });
+}

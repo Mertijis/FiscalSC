@@ -1,0 +1,41 @@
+meta {
+  name: 02 - Pessoal sem Referência Obrigatória (Erro Esperado)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/rest/florianopolis/api/v1/pessoal
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 500
+  res.body: isDefined
+}
+
+tests {
+  test("Servidor deve rejeitar requisição sem competência/referência com HTTP 500", function() {
+    expect(res.getStatus()).to.equal(500);
+  });
+
+  test("Corpo da resposta deve conter erro referente ao parâmetro referencia", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    expect(body.length).to.be.at.least(1);
+    
+    const mensagens = body.map(function(item) {
+      return item.erro && item.erro.mensagem;
+    });
+    
+    const temErroReferencia = mensagens.some(function(msg) {
+      return msg && msg.includes('referencia');
+    });
+    expect(temErroReferencia).to.be.true;
+  });
+}

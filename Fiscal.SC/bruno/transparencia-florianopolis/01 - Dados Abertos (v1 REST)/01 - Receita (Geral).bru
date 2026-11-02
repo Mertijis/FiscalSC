@@ -1,0 +1,62 @@
+meta {
+  name: 01 - Receita (Geral)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/rest/florianopolis/api/v1/receita?periodo_inicial={{periodo_mes_ano}}&periodo_final={{periodo_mes_ano_fim}}&inicio_registro=0&quantidade_registro={{quantidade_padrao}}
+  body: none
+  auth: none
+}
+
+params:query {
+  periodo_inicial: {{periodo_mes_ano}}
+  periodo_final: {{periodo_mes_ano_fim}}
+  inicio_registro: 0
+  quantidade_registro: {{quantidade_padrao}}
+  ~codigo_unidade: 0
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: in [200, 202]
+  res.body.informacao: eq Receita
+  res.body.totalRegistros: isNumber
+  res.body.registros: isDefined
+}
+
+tests {
+  test("Status deve ser 200 (OK) ou 202 (Accepted)", function() {
+    expect([200, 202]).to.include(res.getStatus());
+  });
+
+  test("Cabeçalho Content-Type deve ser JSON", function() {
+    const contentType = res.getHeader('content-type') || '';
+    expect(contentType.toLowerCase()).to.include('application/json');
+  });
+
+  test("Envelope de resposta deve conter totalRegistros e informacao Receita", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.informacao).to.equal('Receita');
+    expect(body.totalRegistros).to.be.a('number');
+    expect(body.totalRegistros).to.be.at.least(0);
+  });
+
+  test("Array de registros deve ser consistente com campos de receita", function() {
+    const body = res.getBody();
+    expect(body.registros).to.be.an('array');
+    if (body.registros.length > 0) {
+      const item = body.registros[0].registro;
+      expect(item).to.be.an('object');
+      expect(item).to.have.property('unidadeGestora');
+      expect(item.unidadeGestora).to.have.property('codigo');
+      expect(item.unidadeGestora).to.have.property('denominacao');
+      expect(item).to.have.property('naturezaReceita');
+    }
+  });
+}

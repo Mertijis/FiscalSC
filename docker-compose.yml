@@ -1,0 +1,63 @@
+services:
+  # 1. Redis para o BullMQ e ioredis
+  redis:
+    image: redis:alpine
+    container_name: fiscal-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fiscal-network
+
+  # 2. Backend (Node.js + Express + BullMQ + Socket.IO)
+  backend:
+    build:
+      context: ./fiscal-backend
+      dockerfile: Dockerfile
+    container_name: fiscal-backend
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./fiscal-backend:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+    networks:
+      - fiscal-network
+
+  # 3. Frontend (Next.js 15)
+  frontend:
+    build:
+      context: ./Fiscal.SC
+      dockerfile: Dockerfile
+    container_name: fiscal-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_WORKER_URL=http://localhost:3001
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+      - NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
+    volumes:
+      - ./Fiscal.SC:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - fiscal-network
+
+volumes:
+  redis_data:
+
+networks:
+  fiscal-network:
+    driver: bridge
+

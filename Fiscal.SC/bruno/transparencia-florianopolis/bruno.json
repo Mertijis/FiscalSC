@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Fiscal SC - Transparência Florianópolis (e-Pública)",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

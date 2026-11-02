@@ -1,0 +1,43 @@
+meta {
+  name: 03 - Filtro por Unidade Gestora (codigo_unidade)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/rest/florianopolis/api/v1/receita?periodo_inicial={{periodo_mes_ano}}&periodo_final={{periodo_mes_ano_fim}}&codigo_unidade={{codigo_unidade_saude}}&quantidade_registro={{quantidade_padrao}}
+  body: none
+  auth: none
+}
+
+params:query {
+  periodo_inicial: {{periodo_mes_ano}}
+  periodo_final: {{periodo_mes_ano_fim}}
+  codigo_unidade: {{codigo_unidade_saude}}
+  quantidade_registro: {{quantidade_padrao}}
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: in [200, 202]
+  res.body.registros: isDefined
+}
+
+tests {
+  test("Status deve ser 200 (OK) ou 202 (Accepted)", function() {
+    expect([200, 202]).to.include(res.getStatus());
+  });
+
+  test("Todos os registros retornados devem pertencer à unidade gestora filtrada (10)", function() {
+    const body = res.getBody();
+    expect(body.registros).to.be.an('array');
+    if (body.registros.length > 0) {
+      body.registros.forEach(function(item) {
+        expect(item.registro.unidadeGestora.codigo).to.equal(10);
+      });
+    }
+  });
+}

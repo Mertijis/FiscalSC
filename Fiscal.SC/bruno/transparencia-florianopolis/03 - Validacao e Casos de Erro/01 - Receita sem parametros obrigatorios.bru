@@ -1,0 +1,41 @@
+meta {
+  name: 01 - Receita sem Parâmetros Obrigatórios (Erro Esperado)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/rest/florianopolis/api/v1/receita
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 500
+  res.body: isDefined
+}
+
+tests {
+  test("Servidor deve rejeitar requisição sem parâmetros obrigatórios com HTTP 500", function() {
+    expect(res.getStatus()).to.equal(500);
+  });
+
+  test("Corpo da resposta deve conter lista de erros de validação", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    expect(body.length).to.be.at.least(1);
+    
+    const mensagens = body.map(function(item) {
+      return item.erro && item.erro.mensagem;
+    });
+    
+    const temErroPeriodoInicial = mensagens.some(function(msg) {
+      return msg && msg.includes('periodo_inicial');
+    });
+    expect(temErroPeriodoInicial).to.be.true;
+  });
+}

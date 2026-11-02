@@ -1,0 +1,60 @@
+meta {
+  name: 03 - Despesa Orçamentária
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/rest/florianopolis/api/v1/despesaOrcamentaria?periodo_inicial={{periodo_mes_ano}}&periodo_final={{periodo_mes_ano_fim}}&inicio_registro=0&quantidade_registro={{quantidade_padrao}}
+  body: none
+  auth: none
+}
+
+params:query {
+  periodo_inicial: {{periodo_mes_ano}}
+  periodo_final: {{periodo_mes_ano_fim}}
+  inicio_registro: 0
+  quantidade_registro: {{quantidade_padrao}}
+  ~codigo_unidade: 0
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: in [200, 202]
+  res.body.informacao: eq Despesa Orçamentária
+  res.body.totalRegistros: isNumber
+  res.body.registros: isDefined
+}
+
+tests {
+  test("Status deve ser 200 (OK) ou 202 (Accepted)", function() {
+    expect([200, 202]).to.include(res.getStatus());
+  });
+
+  test("Cabeçalho Content-Type deve ser JSON", function() {
+    const contentType = res.getHeader('content-type') || '';
+    expect(contentType.toLowerCase()).to.include('application/json');
+  });
+
+  test("Envelope de retorno deve ser do módulo Despesa Orçamentária", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.informacao).to.equal('Despesa Orçamentária');
+    expect(body.totalRegistros).to.be.a('number');
+  });
+
+  test("Registro deve possuir classificação funcional e orçamentária", function() {
+    const body = res.getBody();
+    expect(body.registros).to.be.an('array');
+    if (body.registros.length > 0) {
+      const item = body.registros[0].registro;
+      expect(item).to.be.an('object');
+      expect(item).to.have.property('classificacaoCompleta');
+      expect(item).to.have.property('despesa');
+      expect(item.despesa).to.have.property('funcao');
+    }
+  });
+}

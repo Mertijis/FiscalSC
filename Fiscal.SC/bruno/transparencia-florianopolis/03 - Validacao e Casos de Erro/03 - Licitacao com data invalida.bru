@@ -1,0 +1,30 @@
+meta {
+  name: 03 - Licitação com Formato de Data Inválido (Erro Esperado)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/rest/florianopolis/api/v1/licitacao?periodo_inicial=01-2024&periodo_final=01-2024
+  body: none
+  auth: none
+}
+
+params:query {
+  periodo_inicial: 01-2024
+  periodo_final: 01-2024
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 500
+}
+
+tests {
+  test("Servidor deve rejeitar formato de data incorreto (esperado dd/mm/aaaa) com status 500", function() {
+    expect(res.getStatus()).to.equal(500);
+  });
+}

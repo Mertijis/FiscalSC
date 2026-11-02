@@ -1,0 +1,39 @@
+meta {
+  name: 02 - Limite de Registros (quantidade_registro)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/rest/florianopolis/api/v1/despesa?periodo_inicial={{periodo_mes_ano}}&periodo_final={{periodo_mes_ano_fim}}&inicio_registro=0&quantidade_registro={{quantidade_reduzida}}
+  body: none
+  auth: none
+}
+
+params:query {
+  periodo_inicial: {{periodo_mes_ano}}
+  periodo_final: {{periodo_mes_ano_fim}}
+  inicio_registro: 0
+  quantidade_registro: {{quantidade_reduzida}}
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: in [200, 202]
+  res.body.registros: isDefined
+}
+
+tests {
+  test("Status deve ser 200 (OK) ou 202 (Accepted)", function() {
+    expect([200, 202]).to.include(res.getStatus());
+  });
+
+  test("Array de registros deve conter no máximo a quantidade reduzida solicitada (3)", function() {
+    const body = res.getBody();
+    expect(body.registros).to.be.an('array');
+    expect(body.registros.length).to.be.at.most(3);
+  });
+}
