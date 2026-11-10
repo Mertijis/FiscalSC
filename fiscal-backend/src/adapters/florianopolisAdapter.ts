@@ -1,15 +1,21 @@
 import { CityAdapter, CityQueryParams, ModuleType } from './cityAdapter.interface';
 
-const BASE_URL = 'https://transparencia.e-publica.net/epublica-portal';
+export interface EpublicaAdapterOptions {
+  cityId: string;
+  cityName: string;
+  baseUrl: string;
+  tenantSlug: string;
+  licitacaoMaxDays?: number;
+}
 
 type EndpointConfig = {
-  path: string;
+  getPath: (tenantSlug: string) => string;
   buildQuery: (params: CityQueryParams) => Record<string, string>;
 };
 
 const ENDPOINTS: Record<ModuleType, EndpointConfig> = {
   receita: {
-    path: '/rest/florianopolis/api/v1/receita',
+    getPath: (slug) => `/rest/${slug}/api/v1/receita`,
     buildQuery: (params) => {
       const periodo = params.periodo || params.mes || '01/2024';
       return {
@@ -22,7 +28,7 @@ const ENDPOINTS: Record<ModuleType, EndpointConfig> = {
     },
   },
   despesa: {
-    path: '/rest/florianopolis/api/v1/despesa',
+    getPath: (slug) => `/rest/${slug}/api/v1/despesa`,
     buildQuery: (params) => {
       const periodo = params.periodo || params.mes || '01/2024';
       return {
@@ -35,7 +41,7 @@ const ENDPOINTS: Record<ModuleType, EndpointConfig> = {
     },
   },
   despesaOrcamentaria: {
-    path: '/rest/florianopolis/api/v1/despesaOrcamentaria',
+    getPath: (slug) => `/rest/${slug}/api/v1/despesaOrcamentaria`,
     buildQuery: (params) => {
       const periodo = params.periodo || params.mes || '01/2024';
       return {
@@ -48,7 +54,7 @@ const ENDPOINTS: Record<ModuleType, EndpointConfig> = {
     },
   },
   licitacao: {
-    path: '/rest/florianopolis/api/v1/licitacao',
+    getPath: (slug) => `/rest/${slug}/api/v1/licitacao`,
     buildQuery: (params) => {
       const dataInicio = params.dataInicio || '01/01/2024';
       const dataFim = params.dataFim || '15/01/2024';
@@ -62,7 +68,7 @@ const ENDPOINTS: Record<ModuleType, EndpointConfig> = {
     },
   },
   contrato: {
-    path: '/rest/florianopolis/api/v1/contrato',
+    getPath: (slug) => `/rest/${slug}/api/v1/contrato`,
     buildQuery: (params) => {
       const dataInicio = params.dataInicio || '01/01/2024';
       const dataFim = params.dataFim || '15/01/2024';
@@ -76,7 +82,7 @@ const ENDPOINTS: Record<ModuleType, EndpointConfig> = {
     },
   },
   pessoal: {
-    path: '/rest/florianopolis/api/v1/pessoal',
+    getPath: (slug) => `/rest/${slug}/api/v1/pessoal`,
     buildQuery: (params) => {
       const referencia = params.periodo || params.mes || '01/2024';
       return {
@@ -89,20 +95,34 @@ const ENDPOINTS: Record<ModuleType, EndpointConfig> = {
   },
 };
 
-export class FlorianopolisAdapter implements CityAdapter {
-  cityId = 'florianopolis';
-  cityName = 'Florianópolis';
+export class EpublicaCityAdapter implements CityAdapter {
+  cityId: string;
+  cityName: string;
+  baseUrl: string;
+  tenantSlug: string;
+  licitacaoMaxDays: number;
+
+  constructor(options: EpublicaAdapterOptions) {
+    this.cityId = options.cityId;
+    this.cityName = options.cityName;
+    this.baseUrl = options.baseUrl.replace(/\/+$/, '');
+    this.tenantSlug = options.tenantSlug;
+    this.licitacaoMaxDays = options.licitacaoMaxDays ?? 31;
+  }
 
   async fetchData(queryParams: CityQueryParams): Promise<any> {
     const tipo = (queryParams.tipo as ModuleType) || 'receita';
     const config = ENDPOINTS[tipo];
 
     if (!config) {
-      throw new Error(`Módulo '${tipo}' não suportado para Florianópolis. Opções: ${Object.keys(ENDPOINTS).join(', ')}`);
+      throw new Error(
+        `Módulo '${tipo}' não suportado para ${this.cityName}. Opções: ${Object.keys(ENDPOINTS).join(', ')}`
+      );
     }
 
     const query = config.buildQuery(queryParams);
-    const url = new URL(`${BASE_URL}${config.path}`);
+    const path = config.getPath(this.tenantSlug);
+    const url = new URL(`${this.baseUrl}${path}`);
     Object.entries(query).forEach(([k, v]) => {
       url.searchParams.set(k, v);
     });
@@ -123,7 +143,7 @@ export class FlorianopolisAdapter implements CityAdapter {
       clearTimeout(timeout);
 
       if (!res.ok) {
-        throw new Error(`Servidor da prefeitura retornou status HTTP ${res.status}`);
+        throw new Error(`Servidor da prefeitura (${this.cityName}) retornou status HTTP ${res.status}`);
       }
 
       const data = await res.json();
@@ -144,4 +164,40 @@ export class FlorianopolisAdapter implements CityAdapter {
   }
 }
 
+export class FlorianopolisAdapter extends EpublicaCityAdapter {
+  constructor() {
+    super({
+      cityId: 'florianopolis',
+      cityName: 'Florianópolis',
+      baseUrl: 'https://transparencia.e-publica.net/epublica-portal',
+      tenantSlug: 'florianopolis',
+      licitacaoMaxDays: 15,
+    });
+  }
+}
+
 export const florianopolisAdapter = new FlorianopolisAdapter();
+
+export const joinvilleAdapter = new EpublicaCityAdapter({
+  cityId: 'joinville',
+  cityName: 'Joinville',
+  baseUrl: 'https://transparencia.joinville.sc.gov.br/epublica-portal',
+  tenantSlug: 'joinville',
+  licitacaoMaxDays: 31,
+});
+
+export const itajaiAdapter = new EpublicaCityAdapter({
+  cityId: 'itajai',
+  cityName: 'Itajaí',
+  baseUrl: 'https://portaltransparencia.itajai.sc.gov.br/epublica-portal',
+  tenantSlug: 'itajai',
+  licitacaoMaxDays: 31,
+});
+
+export const chapecoAdapter = new EpublicaCityAdapter({
+  cityId: 'chapeco',
+  cityName: 'Chapecó',
+  baseUrl: 'https://transparencia.e-publica.net/epublica-portal',
+  tenantSlug: 'chapeco',
+  licitacaoMaxDays: 31,
+});

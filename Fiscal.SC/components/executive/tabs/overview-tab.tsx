@@ -41,6 +41,7 @@ const mockSpending = [
 
 export type OverviewTabProps = {
   isFlorianopolis: boolean;
+  name?: string;
   loadingData: boolean;
   periodo: string;
   totalReceitasArrecadadas?: number;
@@ -64,6 +65,7 @@ export type OverviewTabProps = {
 
 export default function OverviewTab({
   isFlorianopolis,
+  name = "Florianópolis",
   loadingData,
   periodo,
   totalReceitasArrecadadas = 0,
@@ -97,7 +99,7 @@ export default function OverviewTab({
             </div>
             <div>
               <strong className="text-sm text-gray-900 block">
-                Integração Total com Dados Abertos de Florianópolis Ativa (6 Módulos)
+                Integração Total com Dados Abertos de {name} Ativa (6 Módulos)
               </strong>
               <p className="text-xs text-gray-600">
                 Explore receitas arrecadadas, despesas pagas, orçamento (LOA), licitações com editais em PDF, contratos e folha de servidores na competência {periodo}.
@@ -537,7 +539,7 @@ export default function OverviewTab({
                   {liveContratos.length}
                 </span>
                 <span className="text-xs font-semibold text-sky-700">
-                  Contratos Extraídos da Base da PMF
+                  Contratos Extraídos da Base Oficial de {name}
                 </span>
               </div>
               <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1.5">

@@ -1,4 +1,5 @@
 import { fetchCityData } from './cityApiService';
+import { getCityAdapter } from '../adapters';
 import { aggregateReceitasTrimestre, ReceitaTrimestreResultado } from './aggregationService';
 
 export type MovimentoDespesa = {
@@ -188,7 +189,7 @@ export function formatCurrencyBRL(val?: number): string {
   return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-export function normalizeReceitas(registros: any[]): ReceitaItem[] {
+export function normalizeReceitas(registros: any[], cityName = 'Florianópolis'): ReceitaItem[] {
   if (!Array.isArray(registros)) return [];
 
   const items = registros.map((item, index) => {
@@ -260,7 +261,7 @@ export function normalizeReceitas(registros: any[]): ReceitaItem[] {
       id: `receita-${rec.codigo || index}-${index}`,
       codigo: rec.codigo || index + 1,
       tipoReceita: rec.tipoReceita || 'Bruta',
-      orgao: reg.unidadeGestora?.denominacao || 'Prefeitura Municipal de Florianópolis',
+      orgao: reg.unidadeGestora?.denominacao || `Prefeitura Municipal de ${cityName}`,
       categoriaEconomica: nat.categoriaEconomica?.denominacao || 'Receitas Correntes',
       origem: nat.origem?.denominacao || 'Outras Receitas',
       especie: nat.especie?.denominacao || 'Geral',
@@ -375,7 +376,7 @@ export function normalizeDespesas(registros: any[]): DespesaItem[] {
   });
 }
 
-export function normalizeLicitacoes(registros: any[]): LicitacaoItem[] {
+export function normalizeLicitacoes(registros: any[], cityName = 'Florianópolis'): LicitacaoItem[] {
   if (!Array.isArray(registros)) return [];
 
   return registros.map((item, index) => {
@@ -405,7 +406,7 @@ export function normalizeLicitacoes(registros: any[]): LicitacaoItem[] {
       objeto: lic.objetoResumido || 'Sem objeto informado.',
       dataEmissao: lic.dataEmissao || '—',
       aberturaData: lic.aberturaData || 'Dispensa / Direta',
-      orgao: ug?.denominacao?.trim() || 'Prefeitura Municipal de Florianópolis',
+      orgao: ug?.denominacao?.trim() || `Prefeitura Municipal de ${cityName}`,
       finalidade: lic.finalidade || 'Contratação Pública',
       formaJulgamento: lic.formaJulgamento || 'Menor Preço',
       situacao: situacaoPrincipal,
@@ -421,7 +422,7 @@ export function normalizeLicitacoes(registros: any[]): LicitacaoItem[] {
   });
 }
 
-export function normalizeContratos(registros: any[]): ContratoItem[] {
+export function normalizeContratos(registros: any[], cityName = 'Florianópolis'): ContratoItem[] {
   if (!Array.isArray(registros)) return [];
 
   return registros.map((item, index) => {
@@ -448,13 +449,13 @@ export function normalizeContratos(registros: any[]): ContratoItem[] {
       objeto: cont.objetoResumido || 'Sem descrição de objeto.',
       fornecedorNome: reg.fornecedor?.pessoa?.nome || 'Fornecedor não informado',
       fornecedorCpfCnpj: reg.fornecedor?.pessoa?.cpfCnpj || '—',
-      orgao: reg.unidadeGestora?.denominacao || 'Prefeitura Municipal de Florianópolis',
+      orgao: reg.unidadeGestora?.denominacao || `Prefeitura Municipal de ${cityName}`,
       itens,
     };
   });
 }
 
-export function normalizePessoal(registros: any[], periodo = '01/2024'): PessoalItem[] {
+export function normalizePessoal(registros: any[], periodo = '01/2024', cityName = 'Florianópolis'): PessoalItem[] {
   if (!Array.isArray(registros)) return [];
 
   return registros.map((item, index) => {
@@ -493,7 +494,7 @@ export function normalizePessoal(registros: any[], periodo = '01/2024'): Pessoal
       nome: mat.nome || 'Servidor não identificado',
       cpf: mat.cpf || '***.***.***-**',
       dataAdmissao: mat.dataAdmissao || '—',
-      orgao: ug.denominacao || 'Prefeitura Municipal de Florianópolis',
+      orgao: ug.denominacao || `Prefeitura Municipal de ${cityName}`,
       cargo: hist.cargo?.denominacao || hist.funcao?.denominacao || 'Cargo Efetivo / Comissionado',
       vinculo: hist.vinculo || 'Estatutário',
       lotacao: hist.local?.denominacao || ug.denominacao || 'Administração Municipal',
@@ -507,7 +508,7 @@ export function normalizePessoal(registros: any[], periodo = '01/2024'): Pessoal
   });
 }
 
-export function normalizeDespesaOrcamentaria(registros: any[]): DespesaOrcamentariaItem[] {
+export function normalizeDespesaOrcamentaria(registros: any[], cityName = 'Florianópolis'): DespesaOrcamentariaItem[] {
   if (!Array.isArray(registros)) return [];
 
   return registros.map((item, index) => {
@@ -545,7 +546,7 @@ export function normalizeDespesaOrcamentaria(registros: any[]): DespesaOrcamenta
       unidadeGestora:
         reg.unidadeOrcamentaria?.unidadeGestora?.denominacao ||
         reg.unidadeOrcamentaria?.denominacao ||
-        'Prefeitura Municipal de Florianópolis',
+        `Prefeitura Municipal de ${cityName}`,
       funcao: reg.despesa?.funcao?.denominacao || 'Administração',
       subfuncao: reg.despesa?.subfuncao?.denominacao || 'Geral',
       programa: reg.despesa?.programa?.denominacao || 'Programa Municipal',
@@ -609,6 +610,9 @@ export async function compileDashboardData(
 
   const compilationPromise = (async () => {
     const startTime = Date.now();
+    const adapter = getCityAdapter(cityId);
+    const cityName = adapter.cityName;
+
     const [mes, ano] = periodo.split('/');
     const anoNum = Number(ano) || 2024;
     const mesNum = Number(mes) || 1;
@@ -617,8 +621,10 @@ export async function compileDashboardData(
     const dataInicio = `01/${mes}/${ano}`;
     const dataFim = `${String(ultimoDia).padStart(2, '0')}/${mes}/${ano}`;
     // Para licitações na prefeitura de Florianópolis, consultas com período muito amplo (31 dias)
-    // causam travamento de 16s no servidor municipal. 15 dias com limite 50 retorna rápido.
-    const dataFimLicitacao = `15/${mes}/${ano}`;
+    // causam travamento de 16s no servidor municipal. Já para Joinville, Itajaí e Chapecó,
+    // o mês fechado (31 dias) retorna rápido (<2.5s) e evita quinzenas vazias.
+    const maxLicDays = adapter.licitacaoMaxDays ? Math.min(ultimoDia, adapter.licitacaoMaxDays) : ultimoDia;
+    const dataFimLicitacao = `${String(maxLicDays).padStart(2, '0')}/${mes}/${ano}`;
 
     // 1. FASE RÁPIDA (Mês Único): Receitas (1000), Despesas (1000), Contratos (200), Despesa Orçamentária (1000) e Pessoal (500)
     const fastPromise = Promise.allSettled([
@@ -636,7 +642,7 @@ export async function compileDashboardData(
       dataFim: dataFimLicitacao,
       limit: 50,
     }).catch((err) => {
-      console.warn(`[Dashboard Warning] Licitação falhou ou demorou:`, err.message);
+      console.warn(`[Dashboard Warning] Licitação (${cityName}) falhou ou demorou:`, err.message);
       return { registros: [] };
     });
 
@@ -649,11 +655,11 @@ export async function compileDashboardData(
     const rawOrcamento = resOrcamento.status === 'fulfilled' ? resOrcamento.value?.registros || [] : [];
     const rawPessoal = resPessoal.status === 'fulfilled' ? resPessoal.value?.registros || [] : [];
 
-    const receitas = normalizeReceitas(rawReceitas);
+    const receitas = normalizeReceitas(rawReceitas, cityName);
     const despesas = normalizeDespesas(rawDespesas);
-    const contratos = normalizeContratos(rawContratos);
-    const despesaOrcamentaria = normalizeDespesaOrcamentaria(rawOrcamento);
-    const pessoal = normalizePessoal(rawPessoal, periodo);
+    const contratos = normalizeContratos(rawContratos, cityName);
+    const despesaOrcamentaria = normalizeDespesaOrcamentaria(rawOrcamento, cityName);
+    let pessoal = normalizePessoal(rawPessoal, periodo, cityName);
     const { total, areas, distribuicao } = calculateAreasDistrib(despesas);
 
     const totalReceitasArrecadadas =
@@ -661,7 +667,31 @@ export async function compileDashboardData(
     const totalReceitasPrevistas =
       Math.round(receitas.reduce((acc, r) => acc + r.valorPrevisto, 0) * 100) / 100;
 
-    const totalFolhaBruta = Math.round(pessoal.reduce((acc, p) => acc + p.remuneracaoBruta, 0) * 100) / 100;
+    let totalFolhaBruta = Math.round(pessoal.reduce((acc, p) => acc + p.remuneracaoBruta, 0) * 100) / 100;
+
+    // Fallback inteligente de Folha de Pessoal: se o mês recém-encerrado (ex: 10/2026) ainda não
+    // teve os eventos financeiros liberados pela prefeitura (totalFolhaBruta === 0), consulta o mês anterior
+    if (totalFolhaBruta === 0) {
+      const prevMesNum = mesNum === 1 ? 12 : mesNum - 1;
+      const prevAnoNum = mesNum === 1 ? anoNum - 1 : anoNum;
+      const prevPeriodo = `${String(prevMesNum).padStart(2, '0')}/${prevAnoNum}`;
+      try {
+        const prevPessoalData = await fetchCityData(cityId, {
+          tipo: 'pessoal',
+          periodo: prevPeriodo,
+          limit: 500,
+        });
+        const prevNormalized = normalizePessoal(prevPessoalData?.registros || [], prevPeriodo, cityName);
+        const prevTotalFolha =
+          Math.round(prevNormalized.reduce((acc, p) => acc + p.remuneracaoBruta, 0) * 100) / 100;
+        if (prevTotalFolha > 0) {
+          pessoal = prevNormalized;
+          totalFolhaBruta = prevTotalFolha;
+        }
+      } catch {
+        // Mantém a listagem original caso o mês anterior falhe
+      }
+    }
     const totalEmpenhadoOrcamento =
       Math.round(despesaOrcamentaria.reduce((acc, o) => acc + o.valorEmpenhado, 0) * 100) / 100;
     const totalLiquidadoOrcamento =
@@ -675,7 +705,7 @@ export async function compileDashboardData(
         status: 'success',
         source: 'worker',
         cityId,
-        cityName: 'Florianópolis',
+        cityName,
         periodo,
         cacheKey,
         resumo: {
@@ -712,7 +742,7 @@ export async function compileDashboardData(
     // Aguarda a conclusão das Licitações
     const rawLicitacoesData = await licitacaoPromise;
     const rawLicitacoes = rawLicitacoesData?.registros || [];
-    const licitacoes = normalizeLicitacoes(rawLicitacoes);
+    const licitacoes = normalizeLicitacoes(rawLicitacoes, cityName);
 
     const tempoExecucaoMs = Date.now() - startTime;
 
@@ -720,7 +750,7 @@ export async function compileDashboardData(
       status: 'success',
       source: 'worker',
       cityId,
-      cityName: 'Florianópolis',
+      cityName,
       periodo,
       cacheKey,
       resumo: {

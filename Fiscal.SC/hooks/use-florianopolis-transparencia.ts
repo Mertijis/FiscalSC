@@ -33,12 +33,24 @@ export const MESES_OPCOES = [
   { valor: "12", label: "Dez (12)" },
 ];
 
-export const ANOS_OPCOES = ["2022", "2023", "2024", "2025"];
+export const ANOS_OPCOES = [
+  "2016",
+  "2017",
+  "2018",
+  "2019",
+  "2020",
+  "2021",
+  "2022",
+  "2023",
+  "2024",
+  "2025",
+  "2026",
+];
 
-export function useFlorianopolisTransparencia(enabled = true) {
+export function useFlorianopolisTransparencia(enabled = true, cityId = "florianopolis") {
   const [loadingData, setLoadingData] = useState(enabled);
-  const [mes, setMes] = useState("01");
-  const [ano, setAno] = useState("2024");
+  const [mes, setMes] = useState("10");
+  const [ano, setAno] = useState("2026");
 
   const periodo = `${mes}/${ano}`;
 
@@ -158,7 +170,7 @@ export function useFlorianopolisTransparencia(enabled = true) {
     });
 
     // Dispara a requisição BFF (se já estiver em cache, o REST retorna instantaneamente em <10ms)
-    fetchExecutiveDashboard("florianopolis", periodo, socketId).then((res) => {
+    fetchExecutiveDashboard(cityId, periodo, socketId).then((res) => {
       if (!isMounted) return;
 
       if (res.status === 200) {
@@ -176,7 +188,7 @@ export function useFlorianopolisTransparencia(enabled = true) {
     // Fallback de segurança: se após 3s ainda estiver carregando, faz uma checagem rápida no cache
     const fallbackTimer = setTimeout(() => {
       if (isMounted) {
-        fetchExecutiveDashboard("florianopolis", periodo).then((fallbackRes) => {
+        fetchExecutiveDashboard(cityId, periodo).then((fallbackRes) => {
           if (isMounted && fallbackRes.status === 200) {
             applyPackage(fallbackRes.data, false);
             socket.disconnect();
@@ -192,7 +204,7 @@ export function useFlorianopolisTransparencia(enabled = true) {
         socketRef.current.disconnect();
       }
     };
-  }, [enabled, periodo]);
+  }, [enabled, cityId, periodo]);
 
   const filteredDespesas = useMemo(() => {
     return liveDespesas.filter((d) => {

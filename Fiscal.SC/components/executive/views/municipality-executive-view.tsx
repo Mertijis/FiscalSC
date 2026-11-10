@@ -25,6 +25,8 @@ const VALID_TABS: ExecutiveTabType[] = [
   "pessoal",
 ];
 
+const LIVE_MUNICIPALITIES = ["florianopolis", "joinville", "itajai", "chapeco"];
+
 const TAB_XP_LABELS: Partial<Record<ExecutiveTabType, { id: string; label: string }>> = {
   receitas: { id: "explore_tab_receitas", label: "Explorou a aba de Receitas de Florianópolis" },
   despesas: { id: "explore_tab_despesas", label: "Explorou a aba de Despesas e Empenhos" },
@@ -51,7 +53,7 @@ export default function MunicipalityExecutiveView({
   contracts,
   bids,
 }: MunicipalityExecutiveViewProps) {
-  const isFlorianopolis = slug === "florianopolis";
+  const isFlorianopolis = LIVE_MUNICIPALITIES.includes(slug);
   const label = `Prefeitura de ${name}`;
   const { awardAction } = useStudy();
 
@@ -76,7 +78,7 @@ export default function MunicipalityExecutiveView({
     }
   }, []);
 
-  // Consume live API hook for Florianopolis
+  // Consume live API hook for connected e-Pública municipalities
   const {
     loadingData,
     mes,
@@ -108,7 +110,7 @@ export default function MunicipalityExecutiveView({
     dynamicConic,
     formatCurrency,
     dashboardSource,
-  } = useFlorianopolisTransparencia(isFlorianopolis);
+  } = useFlorianopolisTransparencia(isFlorianopolis, slug);
 
   return (
     <div className="mx-auto w-full max-w-[1540px] min-w-0 space-y-5">
@@ -170,6 +172,7 @@ export default function MunicipalityExecutiveView({
           <div className="w-full min-w-0 space-y-4">
             <OverviewTab
               isFlorianopolis={isFlorianopolis}
+              name={name}
               loadingData={loadingData}
               periodo={periodo}
               totalReceitasArrecadadas={totalReceitasArrecadadas}
@@ -244,6 +247,7 @@ export default function MunicipalityExecutiveView({
       {activeTab === "licitacoes" && (
         <LicitacoesTab
           isFlorianopolis={isFlorianopolis}
+          cityId={slug}
           name={name}
           periodo={periodo}
           loadingData={loadingData}
@@ -277,8 +281,8 @@ export default function MunicipalityExecutiveView({
         />
       )}
 
-      {/* Footer Banner */}
-      <ExecutiveFooter isFlorianopolis={isFlorianopolis} />
+      {/* Footer Banner
+      <ExecutiveFooter isFlorianopolis={isFlorianopolis} /> */}
     </div>
   );
 }

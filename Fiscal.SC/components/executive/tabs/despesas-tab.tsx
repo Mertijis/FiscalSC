@@ -86,7 +86,7 @@ export default function DespesasTab({
             Empenhos e Liquidações Oficiais — {name}
           </h3>
           <p className="text-xs text-gray-500 break-words">
-            Dados extraídos ao vivo do Portal da Transparência de Florianópolis para a competência {periodo}.
+            Dados extraídos ao vivo do Portal da Transparência de {name} para a competência {periodo}.
           </p>
         </div>
 

@@ -34,21 +34,24 @@ import { setCache, getCache } from './redis/client';
 server.listen(PORT, () => {
   console.log(`🚀 Fiscal Backend (Worker) rodando na porta ${PORT}`);
 
-  // Pre-aquecimento em segundo plano do dashboard padrão para resposta instantânea (<10ms)
+  // Pre-aquecimento em segundo plano dos dashboards padrão (10/2026) para resposta instantânea (<10ms)
   setTimeout(async () => {
-    try {
-      const cacheKey = 'dashboard_v4_florianopolis_01_2024';
-      const existing = await getCache(cacheKey);
-      if (!existing) {
-        console.log(`[Cache Warm-up] Pré-aquecendo ${cacheKey} em segundo plano...`);
-        const data = await compileDashboardData('florianopolis', '01/2024');
-        await setCache(cacheKey, data, 86400);
-        console.log(`[Cache Warm-up] ${cacheKey} pré-aquecido com sucesso!`);
-      } else {
-        console.log(`[Cache Warm-up] ${cacheKey} já presente no Redis.`);
+    const citiesToWarm = ['florianopolis', 'joinville', 'itajai', 'chapeco'];
+    for (const cityId of citiesToWarm) {
+      try {
+        const cacheKey = `dashboard_v4_${cityId}_10_2026`;
+        const existing = await getCache(cacheKey);
+        if (!existing) {
+          console.log(`[Cache Warm-up] Pré-aquecendo ${cacheKey} em segundo plano...`);
+          const data = await compileDashboardData(cityId, '10/2026');
+          await setCache(cacheKey, data, 86400);
+          console.log(`[Cache Warm-up] ${cacheKey} pré-aquecido com sucesso!`);
+        } else {
+          console.log(`[Cache Warm-up] ${cacheKey} já presente no Redis.`);
+        }
+      } catch (e: any) {
+        console.warn(`[Cache Warm-up Aviso (${cityId})]`, e.message);
       }
-    } catch (e: any) {
-      console.warn(`[Cache Warm-up Aviso]`, e.message);
     }
   }, 1000);
 });

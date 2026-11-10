@@ -16,6 +16,7 @@ import type { LicitacaoItem } from "@/lib/transparencia-service";
 
 export type LicitacoesTabProps = {
   isFlorianopolis: boolean;
+  cityId?: string;
   name: string;
   periodo?: string;
   loadingData: boolean;
@@ -25,6 +26,7 @@ export type LicitacoesTabProps = {
 
 export default function LicitacoesTab({
   isFlorianopolis,
+  cityId = "florianopolis",
   name,
   periodo = "01/2024",
   loadingData,
@@ -190,7 +192,7 @@ export default function LicitacoesTab({
                       </span>
                       {lic.links.map((doc, idx) => {
                         const safeFileName = `${lic.numero}_${doc.denominacao}`;
-                        const downloadUrl = `/api/download?url=${encodeURIComponent(doc.link)}&filename=${encodeURIComponent(safeFileName)}&periodo=${encodeURIComponent(periodo)}`;
+                        const downloadUrl = `/api/download?url=${encodeURIComponent(doc.link)}&filename=${encodeURIComponent(safeFileName)}&periodo=${encodeURIComponent(periodo)}&cityId=${encodeURIComponent(cityId)}`;
 
                         return (
                           <a

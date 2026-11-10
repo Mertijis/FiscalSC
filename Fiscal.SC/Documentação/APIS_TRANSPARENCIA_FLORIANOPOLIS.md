@@ -340,3 +340,60 @@ Para filtrar por órgãos específicos em Florianópolis, utilize os seguintes c
    * Como utilizam o formato `dd/mm/aaaa`, evitar solicitar períodos de um ano inteiro em uma única requisição. Consultar mês a mês para garantir respostas rápidas e sem *timeout*.
 3. **Persistência no MongoDB Atlas:**
    * Os dados retornados no array `registros` possuem chaves normalizadas que podem ser mapeadas diretamente para as coleções do Fiscal SC (`expenses`, `contracts`, etc.), mantendo a rastreabilidade do órgão e ano de exercício.
+
+---
+
+## 8. Expansão Multi-Municipal: Joinville, Itajaí e Chapecó (e-Pública)
+
+Os municípios de **Joinville**, **Itajaí** e **Chapecó** utilizam a mesma arquitetura de Dados Abertos **e-Pública REST v1**, compartilhando os 6 endpoints (`/receita`, `/despesa`, `/despesaOrcamentaria`, `/licitacao`, `/contrato`, `/pessoal`).
+
+### 8.1. Mapeamento de Base URLs e Slugs
+
+| Município | `cityId` / Slug | Base URL | Entidade Form | Armazenamento de Editais (PDF) |
+| :--- | :--- | :--- | :---: | :--- |
+| **Florianópolis** | `florianopolis` | `https://transparencia.e-publica.net/epublica-portal` | `2002` | Oracle Cloud (`*.customer-oci.com/p/.../o/florianopolis/*`) |
+| **Joinville** | `joinville` | `https://transparencia.joinville.sc.gov.br/epublica-portal` | `650` | File Server Próprio (`epublica.joinville.sc.gov.br/epublica/app/file-server/file/public`) |
+| **Itajaí** | `itajai` | `https://portaltransparencia.itajai.sc.gov.br/epublica-portal` | `411` | Oracle Cloud (`*.customer-oci.com/p/.../o/itajai/*`) |
+| **Chapecó** | `chapeco` | `https://transparencia.e-publica.net/epublica-portal` | — | Oracle Cloud (`*.customer-oci.com/p/.../o/chapeco/*`) |
+
+### 8.2. Unidades Gestoras — Joinville (`entidade=650`)
+
+| Código | Unidade Gestora / Órgão |
+| :---: | :--- |
+| `0` | Prefeitura Municipal de Joinville - PMJ |
+| `1` | Câmara de Vereadores de Joinville - CVJ |
+| `2` | Fundo Municipal de Saúde - FMS |
+| `3` | Hospital Municipal São José - HMSJ |
+| `6` | Fundação IPPUJ |
+| `8` | Fundação Cultural de Joinville - FCJ |
+| `17` | Fundo Municipal de Assistência Social - FMAS |
+| `22` | Instituto de Previdência Social dos Servidores Públicos de Joinville - IPREVILLE |
+| `27` | Departamento de Trânsito de Joinville - DETRANS |
+
+### 8.3. Unidades Gestoras — Itajaí (`entidade=411`)
+
+| Código | Unidade Gestora / Órgão |
+| :---: | :--- |
+| `1` | Município de Itajaí |
+| `3` | Fundação Cultural de Itajaí |
+| `5` | Fundação Municipal de Esporte e Lazer - FMEL |
+| `12` | Instituto de Previdência de Itajaí - IPI |
+| `16` | Fundo Municipal de Saúde de Itajaí |
+| `18` | Superintendência do Porto de Itajaí |
+| `19` | SEMASA - Serviço Municipal de Água, Saneamento Básico e Infraestrutura |
+| `66` | Instituto Itajaí Sustentável - INIS |
+| `88` | Fundo Municipal de Assistência Social - FMAS |
+
+### 8.4. Unidades Gestoras — Chapecó
+
+| Código | Unidade Gestora / Órgão |
+| :---: | :--- |
+| `1` | Prefeitura Municipal de Chapecó |
+| `2` | Fundo Municipal de Saúde de Chapecó |
+| `3` | Instituto do Sistema Municipal de Previdência de Chapecó |
+| `4` | Fundo Municipal de Assistência do Servidor Municipal de Chapecó |
+| `6` | Fundo Municipal de Assistência Social de Chapecó |
+| `8` | Fundo Municipal da Infância e Adolescência de Chapecó |
+| `9` | Fundação Cultural de Chapecó |
+| `10` | Fundação Municipal de Desporto de Chapecó |
+| `18` | Câmara Municipal de Chapecó |

@@ -21,5 +21,6 @@ export interface CityQueryParams {
 export interface CityAdapter {
   cityId: string;
   cityName: string;
+  licitacaoMaxDays?: number;
   fetchData(queryParams: CityQueryParams): Promise<any>;
 }

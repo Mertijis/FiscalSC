@@ -100,7 +100,7 @@ export default function ExecutiveMetricCards({
         }
         trend={
           isFlorianopolis
-            ? "Base oficial da PMF"
+            ? "Base oficial e-Pública"
             : "+3,1% vs mês anterior"
         }
         color="#1267b4"

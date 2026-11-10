@@ -13,7 +13,7 @@ import {
   ShieldCheck,
   Users,
 } from "lucide-react";
-import { formatPopulation, municipalities } from "@/data/municipalities";
+import { municipalities } from "@/data/municipalities";
 
 export default function ExecutivePage() {
   const [query, setQuery] = useState("");
@@ -43,35 +43,14 @@ export default function ExecutivePage() {
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
         <div className="min-w-0">
-          <section className="grid gap-4 md:grid-cols-2">
-            <Link
-              href="/gastos/estado"
-              data-testid="state-card"
-              className="group relative flex min-h-[220px] min-w-0 flex-col sm:flex-row items-center gap-5 overflow-hidden rounded-xl border-2 border-[#42a868] bg-white p-6 shadow-[0_4px_20px_rgba(22,84,57,.06)] transition hover:-translate-y-0.5 hover:shadow-[0_15px_35px_rgba(22,84,57,.13)]"
+          <section className="grid gap-4">
+            <a
+              href="#municipios"
+              className="group relative flex min-h-[180px] min-w-0 flex-col sm:flex-row items-center gap-5 overflow-hidden rounded-xl border-2 border-[#42a868] bg-white p-6 shadow-[0_4px_20px_rgba(22,84,57,.06)] transition hover:-translate-y-0.5 hover:shadow-[0_15px_35px_rgba(22,84,57,.13)]"
             >
               <span className="absolute right-0 top-0 grid size-12 place-items-center rounded-bl-[48px] bg-[#169a4e] pl-2 pb-2 text-white">
                 <ShieldCheck size={20} />
               </span>
-              <div className="relative grid h-[125px] w-[145px] shrink-0 place-items-center">
-                <div className="absolute h-20 w-32 -rotate-6 rounded-[45%_55%_48%_52%] bg-[linear-gradient(145deg,#197e3d,#3a9d55)] opacity-95" />
-                <div className="relative grid size-14 rotate-45 place-items-center border-[4px] border-white bg-[#e63946]">
-                  <span className="-rotate-45 text-xl text-white">✦</span>
-                </div>
-              </div>
-              <div className="min-w-0 flex-1 pr-4">
-                <h3 className="font-display text-xl xl:text-[22px] font-extrabold leading-[1.18] text-gray-900">
-                  Governo do Estado de Santa Catarina
-                </h3>
-                <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#365780]">
-                  Acompanhe os dados consolidados de todo o estado.
-                </p>
-              </div>
-            </Link>
-
-            <a
-              href="#municipios"
-              className="group flex min-h-[220px] min-w-0 flex-col sm:flex-row items-center gap-5 rounded-xl border border-[#dce4e1] bg-white p-6 shadow-[0_4px_20px_rgba(22,84,57,.05)] transition hover:-translate-y-0.5 hover:border-[#78ae8d] hover:shadow-[0_15px_35px_rgba(22,84,57,.1)]"
-            >
               <div className="flex h-[125px] w-[145px] shrink-0 items-end justify-center gap-1 text-[#164f7d]">
                 <Building2 size={105} strokeWidth={1.3} />
                 <Building2
@@ -80,12 +59,12 @@ export default function ExecutivePage() {
                   className="-ml-7 text-[#2476aa]"
                 />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 pr-4">
                 <h3 className="font-display text-xl xl:text-[22px] font-extrabold leading-[1.18] text-gray-900">
                   Prefeituras Municipais
                 </h3>
                 <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#365780]">
-                  Selecione um município para acompanhar os dados locais.
+                  Selecione um município catarinense abaixo para acompanhar os dados do executivo municipal.
                 </p>
               </div>
             </a>
@@ -182,12 +161,7 @@ export default function ExecutivePage() {
                     </span>
                   </div>
                   <div className="mt-auto flex items-end justify-between border-t border-[#edf1ef] pt-2 text-[10px] text-[#2f527c]">
-                    <span>
-                      População:{" "}
-                      <strong>
-                        {formatPopulation(municipality.population)}
-                      </strong>
-                    </span>
+                    <span>Acessar dados</span>
                     <ArrowRight
                       size={15}
                       className="shrink-0 transition group-hover:translate-x-1"
@@ -220,9 +194,9 @@ export default function ExecutivePage() {
                   <Landmark size={23} />
                 </span>
                 <p>
-                  <strong className="text-xs">Escolha o âmbito</strong>
+                  <strong className="text-xs">Escolha o município</strong>
                   <span className="mt-1 block text-xs leading-5 text-[#456489]">
-                    Selecione entre Estado ou um município específico.
+                    Selecione um município específico para acompanhar.
                   </span>
                 </p>
               </div>
