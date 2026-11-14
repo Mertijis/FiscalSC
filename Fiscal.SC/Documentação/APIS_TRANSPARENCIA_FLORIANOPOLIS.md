@@ -338,8 +338,8 @@ Para filtrar por órgãos específicos em Florianópolis, utilize os seguintes c
    * Utilizar lotes de `100` a `500` registros. A API suporta paginação transparente baseada em deslocamento (*offset*).
 2. **Intervalo Temporal Curto para Licitações e Contratos:**
    * Como utilizam o formato `dd/mm/aaaa`, evitar solicitar períodos de um ano inteiro em uma única requisição. Consultar mês a mês para garantir respostas rápidas e sem *timeout*.
-3. **Persistência no MongoDB Atlas:**
-   * Os dados retornados no array `registros` possuem chaves normalizadas que podem ser mapeadas diretamente para as coleções do Fiscal SC (`expenses`, `contracts`, etc.), mantendo a rastreabilidade do órgão e ano de exercício.
+3. **Cache no Redis via `fiscal-backend`:**
+   * Os dados retornados no array `registros` possuem chaves normalizadas que são consolidadas pelo `fiscal-backend` em pacotes de dashboard armazenados no Redis, mantendo a rastreabilidade do órgão e ano de exercício.
 
 ---
 
