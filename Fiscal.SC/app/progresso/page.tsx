@@ -32,7 +32,6 @@ export default function ProgressPage() {
     completedActions,
     unlockedAchievements,
     points,
-    coins,
     level,
     levelTitle,
     levelProgress,
@@ -96,7 +95,7 @@ export default function ProgressPage() {
         </div>
         <div className="level-points">
           {points.toLocaleString("pt-BR")} XP
-          <small>{coins} moedas acumuladas</small>
+          <small>{completed.length} missões concluídas</small>
         </div>
       </section>
 

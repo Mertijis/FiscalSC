@@ -74,7 +74,7 @@ export default function ResearchPage() {
           <button
             className="btn btn-ghost"
             onClick={resetProgress}
-            title="Zera missões, ações, moedas e retorna ao Nível 1 (0 XP)"
+            title="Zera missões, ações e retorna ao Nível 1 (0 XP)"
           >
             Zerar Progresso (Nível 1 / 0 XP)
           </button>

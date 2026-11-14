@@ -5,7 +5,6 @@ export type Mission = {
   duracao: string;
   duracaoMinutos: number;
   pontos: number;
-  moedas: number;
   categoria:
     | "Receitas e Tributos"
     | "Orçamento e Gastos"
@@ -47,7 +46,6 @@ export const missions: Mission[] = [
     duracao: "4 min",
     duracaoMinutos: 4,
     pontos: 100,
-    moedas: 50,
     categoria: "Receitas e Tributos",
     abaExecutivo: "receitas",
     acaoTexto: "Abrir Receitas de Florianópolis",
@@ -70,7 +68,6 @@ export const missions: Mission[] = [
     duracao: "5 min",
     duracaoMinutos: 5,
     pontos: 120,
-    moedas: 60,
     categoria: "Orçamento e Gastos",
     abaExecutivo: "despesas",
     acaoTexto: "Inspecionar Despesas e Empenhos",
@@ -93,7 +90,6 @@ export const missions: Mission[] = [
     duracao: "5 min",
     duracaoMinutos: 5,
     pontos: 100,
-    moedas: 50,
     categoria: "Orçamento e Gastos",
     abaExecutivo: "orcamento",
     acaoTexto: "Explorar Orçamento (LOA)",
@@ -116,7 +112,6 @@ export const missions: Mission[] = [
     duracao: "6 min",
     duracaoMinutos: 6,
     pontos: 110,
-    moedas: 55,
     categoria: "Contratos e Licitações",
     abaExecutivo: "licitacoes",
     acaoTexto: "Ver Licitações e Editais",
@@ -139,7 +134,6 @@ export const missions: Mission[] = [
     duracao: "5 min",
     duracaoMinutos: 5,
     pontos: 100,
-    moedas: 50,
     categoria: "Contratos e Licitações",
     abaExecutivo: "contratos",
     acaoTexto: "Auditar Contratos da PMF",
@@ -162,7 +156,6 @@ export const missions: Mission[] = [
     duracao: "4 min",
     duracaoMinutos: 4,
     pontos: 90,
-    moedas: 45,
     categoria: "Transparência",
     abaExecutivo: "pessoal",
     acaoTexto: "Consultar Servidores e Folha",
@@ -185,7 +178,6 @@ export const missions: Mission[] = [
     duracao: "3 min",
     duracaoMinutos: 3,
     pontos: 80,
-    moedas: 40,
     categoria: "Transparência",
     abaExecutivo: "overview",
     acaoTexto: "Testar Seletor de Competência",
@@ -208,7 +200,6 @@ export const missions: Mission[] = [
     duracao: "2 min",
     duracaoMinutos: 2,
     pontos: 70,
-    moedas: 35,
     categoria: "Participação",
     abaExecutivo: "overview",
     acaoTexto: "Acessar Painel Executivo",
@@ -231,7 +222,6 @@ export const missions: Mission[] = [
     duracao: "3 min",
     duracaoMinutos: 3,
     pontos: 80,
-    moedas: 40,
     categoria: "Transparência",
     abaExecutivo: "overview",
     acaoTexto: "Ver Portal Executivo",

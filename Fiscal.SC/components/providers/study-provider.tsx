@@ -30,7 +30,6 @@ export type XpToast = {
   title: string;
   subtitle?: string;
   xp: number;
-  coins?: number;
   isLevelUp?: boolean;
 };
 
@@ -44,7 +43,6 @@ type StudyContextValue = {
   events: StudyEvent[];
   participant: Participant | null;
   points: number;
-  coins: number;
   level: number;
   levelTitle: string;
   nextLevelTitle: string;
@@ -77,6 +75,28 @@ const ACTION_XP_MAP: Record<string, number> = {
   change_competencia: 20,
   share_dashboard: 20,
 };
+
+const WEEKLY_SPECIAL_MIN_MISSIONS = 5;
+const WEEKLY_SPECIAL_XP_BONUS = 250;
+
+/**
+ * Fonte única do cálculo de XP. Usada tanto no total do perfil quanto nos avisos (toasts),
+ * para que o valor anunciado nunca divirja do valor efetivamente creditado.
+ */
+export function calculatePoints(completedMissions: string[], completedActions: string[]): number {
+  const missionPoints = completedMissions.reduce(
+    (sum, id) => sum + (missions.find((m) => m.id === id)?.pontos ?? 0),
+    0,
+  );
+  const actionPoints = completedActions.reduce(
+    (sum, id) => sum + (ACTION_XP_MAP[id] ?? 20),
+    0,
+  );
+  // Bônus da Missão Especial da Semana (5 missões concluídas)
+  const weeklyBonus =
+    completedMissions.length >= WEEKLY_SPECIAL_MIN_MISSIONS ? WEEKLY_SPECIAL_XP_BONUS : 0;
+  return missionPoints + actionPoints + weeklyBonus;
+}
 
 export function getLevelTitle(lvl: number): string {
   if (lvl <= 1) return "Cidadão Iniciante";
@@ -181,7 +201,6 @@ export function StudyProvider({ children }: { children: ReactNode }) {
 
     const missionObj = missions.find((m) => m.id === missionId);
     const pts = awardedPoints ?? missionObj?.pontos ?? 100;
-    const missionCoins = missionObj?.moedas ?? 50;
 
     const next = [...completedRef.current, missionId];
     completedRef.current = next;
@@ -199,7 +218,6 @@ export function StudyProvider({ children }: { children: ReactNode }) {
         : "Missão concluída!",
       subtitle: "Recompensa creditada no seu perfil de Fiscal Cidadão",
       xp: pts,
-      coins: missionCoins,
     });
   }
 
@@ -267,9 +285,8 @@ export function StudyProvider({ children }: { children: ReactNode }) {
     track("progress_simulated_demo");
     pushToast({
       title: "Progresso de demonstração carregado!",
-      subtitle: "3 missões e 3 explorações ativadas",
-      xp: 395,
-      coins: 160,
+      subtitle: `${demoCompleted.length} missões e ${demoActions.length} explorações ativadas`,
+      xp: calculatePoints(demoCompleted, demoActions),
     });
   }
 
@@ -282,31 +299,8 @@ export function StudyProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  const missionPointsTotal = completed.reduce((sum, id) => {
-    const found = missions.find((m) => m.id === id);
-    return sum + (found?.pontos ?? 0);
-  }, 0);
-
-  const actionPointsTotal = completedActions.reduce(
-    (sum, id) => sum + (ACTION_XP_MAP[id] ?? 20),
-    0,
-  );
-
-  // Bonus de 250 XP se concluir a Missão Especial da Semana (5 missões)
-  const weeklySpecialBonus = completed.length >= 5 ? 250 : 0;
-
   const points =
-    conditionState === "gamificada"
-      ? missionPointsTotal + actionPointsTotal + weeklySpecialBonus
-      : 0;
-
-  const coins =
-    conditionState === "gamificada"
-      ? completed.reduce((sum, id) => {
-          const found = missions.find((m) => m.id === id);
-          return sum + (found?.moedas ?? 0);
-        }, 0) + (completed.length >= 5 ? 150 : 0)
-      : 0;
+    conditionState === "gamificada" ? calculatePoints(completed, completedActions) : 0;
 
   const level = 1 + Math.floor(points / XP_PER_LEVEL);
   const levelTitle = getLevelTitle(level);
@@ -344,7 +338,6 @@ export function StudyProvider({ children }: { children: ReactNode }) {
         events,
         participant,
         points,
-        coins,
         level,
         levelTitle,
         nextLevelTitle,
@@ -380,11 +373,6 @@ export function StudyProvider({ children }: { children: ReactNode }) {
                   <span className="inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
                     +{toast.xp} XP
                   </span>
-                  {toast.coins && (
-                    <span className="inline-flex items-center rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-black text-slate-950">
-                      +{toast.coins} moedas
-                    </span>
-                  )}
                 </div>
                 <p className="mt-1 text-xs font-extrabold leading-snug text-white">
                   {toast.title}

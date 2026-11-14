@@ -145,13 +145,6 @@ function MissionCard({
       <div>
         <div className="mt-4 flex items-center gap-5 text-xs font-extrabold text-[#0b1f36]">
           <span style={{ color: visual.color }}>+{mission.pontos} XP</span>
-          <span className="flex items-center gap-1.5">
-            <CircleDollarSign
-              size={16}
-              className="fill-[#ffb900] text-[#ffb900]"
-            />
-            <span>+{mission.moedas} moedas</span>
-          </span>
         </div>
 
         <div className="mt-3 flex items-center gap-3">
@@ -196,7 +189,6 @@ export default function MissionsPage() {
     completedActions,
     unlockedAchievements,
     points,
-    coins,
     level,
     levelTitle,
     levelProgress,
@@ -442,12 +434,6 @@ export default function MissionsPage() {
                     {points.toLocaleString("pt-BR")} XP
                   </dd>
                 </div>
-                <div className="flex justify-between gap-2">
-                  <dt className="truncate">Moedas</dt>
-                  <dd className="shrink-0 font-extrabold text-[#d97706]">
-                    {coins} moedas
-                  </dd>
-                </div>
               </dl>
             </div>
           </section>
@@ -476,7 +462,6 @@ export default function MissionsPage() {
               </div>
               <p className="mt-4 flex flex-wrap gap-4 text-xs font-extrabold text-[#f09a00]">
                 <span>+250 XP Bônus</span>
-                <span>★ +150 moedas</span>
               </p>
               <div className="mt-3.5 flex items-center gap-3">
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#edf0f3]">

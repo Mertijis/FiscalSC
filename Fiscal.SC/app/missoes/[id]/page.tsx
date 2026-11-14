@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ArrowRight, CheckCircle2, CircleDollarSign, ExternalLink } from "lucide-react";
+import { ArrowRight, CheckCircle2, ExternalLink } from "lucide-react";
 import { missions } from "@/data/content";
 import { BackLink } from "@/components/ui";
 import { useStudy } from "@/components/providers/study-provider";
@@ -56,12 +56,7 @@ export default function MissionDetailPage() {
           <div className="mission-meta">
             <span>◷ {mission.duracao}</span>
             {condition === "gamificada" && (
-              <>
-                <span>✦ +{mission.pontos} XP</span>
-                <span className="inline-flex items-center gap-1">
-                  <CircleDollarSign size={14} /> +{mission.moedas} moedas
-                </span>
-              </>
+              <span>✦ +{mission.pontos} XP</span>
             )}
             {done && (
               <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
@@ -117,7 +112,7 @@ export default function MissionDetailPage() {
                 {feedback === "ok"
                   ? condition === "gamificada"
                     ? done
-                      ? `Resposta correta! Você garantiu +${mission.pontos} XP e +${mission.moedas} moedas.`
+                      ? `Resposta correta! Você garantiu +${mission.pontos} XP.`
                       : `Parabéns! Resposta correta: +${mission.pontos} XP creditados.`
                     : "Resposta correta registrada com sucesso."
                   : "Ainda não. Releia a explicação do Passo 1 e tente novamente."}

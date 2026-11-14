@@ -14,6 +14,7 @@ import {
   Megaphone,
   ShieldCheck,
   Sparkles,
+  Star,
   Target,
   Users,
 } from "lucide-react";
@@ -76,7 +77,6 @@ export default function HomePage() {
     completedActions,
     unlockedAchievements,
     points,
-    coins,
     level,
     levelTitle,
     nextLevelTitle,
@@ -132,7 +132,7 @@ export default function HomePage() {
 
         <article className="grid min-h-[145px] min-w-0 place-items-center rounded-xl border border-[#e0e7e4] bg-white p-4 text-center shadow-sm">
           <span className="grid size-10 place-items-center rounded-full bg-[#fff1c8] text-[#e9a500]">
-            <CircleDollarSign size={22} />
+            <Star size={22} />
           </span>
           <div>
             <strong className="text-xl">
@@ -141,7 +141,7 @@ export default function HomePage() {
             <p className="text-[11px] text-[#4d6988]">Pontos de Cidadania</p>
           </div>
           <small className="font-bold text-[#208b3f]">
-            {coins} moedas acumuladas
+            {completed.length} missões concluídas
           </small>
         </article>
 
