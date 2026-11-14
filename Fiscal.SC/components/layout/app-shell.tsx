@@ -42,7 +42,7 @@ const pageMeta: Record<
   { title: string; subtitle: string; icon: LucideIcon }
 > = {
   "/": {
-    title: "Olá, Victor! 👋",
+    title: "Olá! 👋",
     subtitle: "Bem-vindo de volta, Fiscal Cidadão.",
     icon: ShieldCheck,
   },
@@ -226,7 +226,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </span>
             <div className="min-w-0">
               <h1 className="truncate text-xl font-extrabold leading-tight tracking-tight md:text-[27px]">
-                {meta.title}
+                {section === "/" && participant?.alias
+                  ? `Olá, ${participant.alias}! 👋`
+                  : meta.title}
               </h1>
               <p className="hidden truncate text-xs text-[#173d6a] md:block">
                 {meta.subtitle}
@@ -265,11 +267,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <div className="hidden h-9 w-px bg-[#e2e8e5] sm:block" />
           <div className="flex items-center gap-2.5">
             <div className="grid size-10 place-items-center rounded-full bg-[linear-gradient(145deg,#37a9da,#33a853)] text-sm font-extrabold text-white ring-2 ring-white shadow">
-              {participant?.alias?.slice(0, 1).toUpperCase() || "V"}
+              {participant?.alias?.slice(0, 1).toUpperCase() || "F"}
             </div>
             <div className="hidden min-w-24 xl:block">
               <strong className="block text-xs">
-                {participant?.alias || "Victor Fineto"}
+                {participant?.alias || "Fiscal Cidadão"}
               </strong>
               <span className="text-[10px] font-semibold text-[#365b8c]">
                 {levelTitle}

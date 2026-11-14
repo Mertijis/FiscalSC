@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import {
-  ArrowDown,
   BookOpen,
   CheckCircle2,
   Circle,
   CircleDollarSign,
-  FileCheck2,
   FileText,
   Flame,
-  Gavel,
   Heart,
   Landmark,
   Medal,
@@ -50,44 +47,6 @@ const investigations = [
     color: "#7c3aed",
     icon: BookOpen,
     href: "/gastos/municipio/florianopolis?tab=contratos",
-  },
-];
-
-const overview = [
-  {
-    label: "Receitas (2025)",
-    value: "R$ 1,24 bi",
-    trend: "+8,2% vs mês anterior",
-    color: "#349948",
-    icon: Users,
-  },
-  {
-    label: "Despesas Pagas (2025)",
-    value: "R$ 1,11 bi",
-    trend: "+4,7% vs mês anterior",
-    color: "#d94747",
-    icon: ArrowDown,
-  },
-  {
-    label: "Contratos Ativos",
-    value: "1.248",
-    trend: "+3,1% vs mês anterior",
-    color: "#287eb2",
-    icon: FileText,
-  },
-  {
-    label: "Licitações em Andamento",
-    value: "87",
-    trend: "-2,3% vs mês anterior",
-    color: "#7a3fbd",
-    icon: Gavel,
-  },
-  {
-    label: "Pedidos LAI Respondidos",
-    value: "98,3%",
-    trend: "+1,4% vs mês anterior",
-    color: "#3c9a4a",
-    icon: FileCheck2,
   },
 ];
 
@@ -141,7 +100,7 @@ export default function HomePage() {
       <section className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.5fr_repeat(3,minmax(0,1fr))]">
         <article className="flex min-h-[145px] min-w-0 items-center gap-4 rounded-xl border border-[#e0e7e4] bg-white p-5 shadow-[0_4px_18px_rgba(26,62,52,.05)] sm:col-span-2 lg:col-span-1">
           <div className="grid size-[76px] xl:size-[88px] shrink-0 place-items-center rounded-full bg-[linear-gradient(145deg,#44a9d5,#4ca555)] text-2xl xl:text-3xl font-black text-white ring-4 ring-[#e4b526]">
-            {participant?.alias?.slice(0, 1).toUpperCase() || "V"}
+            {participant?.alias?.slice(0, 1).toUpperCase() || "F"}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-start justify-between gap-2">
@@ -371,46 +330,6 @@ export default function HomePage() {
             </article>
           </section>
 
-          <section className="min-w-0 rounded-xl border border-[#e0e7e4] bg-white p-5 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-extrabold text-[#244d76]">
-                Panorama Geral de Santa Catarina
-              </h2>
-              <span className="text-[10px] text-[#667f98]">
-                Dados públicos consolidados
-              </span>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {overview.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <article
-                    key={item.label}
-                    className="flex min-w-0 items-center gap-3 rounded-lg border border-[#e7ece9] p-3.5"
-                  >
-                    <span
-                      className="grid size-9 shrink-0 place-items-center rounded-full bg-[#edf5ef]"
-                      style={{ color: item.color }}
-                    >
-                      <Icon size={17} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <small className="block truncate text-[10px] text-[#4f6a87]">
-                        {item.label}
-                      </small>
-                      <strong className="block truncate text-sm">{item.value}</strong>
-                      <small
-                        className="block truncate text-[9px] font-semibold"
-                        style={{ color: item.color }}
-                      >
-                        {item.trend}
-                      </small>
-                    </span>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
         </div>
 
         <aside className="grid min-w-0 content-start gap-4">

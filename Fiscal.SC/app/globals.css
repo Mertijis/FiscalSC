@@ -3,7 +3,7 @@
 
 @theme {
   --color-ink: #17352f;
-  --color-muted: #64766f;
+  --color-muted: #5d6f68; /* antes: #64766f (contraste insuficiente) */
   --color-paper: #f6f4ed;
   --color-surface: #fffef9;
   --color-line: #dfe4dc;
