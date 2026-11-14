@@ -224,10 +224,6 @@ export default function ExecutivePage() {
               </div>
             </div>
           </section>
-
-          <p className="flex items-center gap-2 px-1 text-[10px] text-[#7790a7]">
-            <MapPinned size={14} /> Última atualização: 27/05/2025 09:30
-          </p>
         </aside>
       </div>
     </div>

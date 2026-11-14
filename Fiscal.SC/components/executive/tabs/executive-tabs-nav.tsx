@@ -9,6 +9,8 @@ import {
   Landmark,
   Users,
   RefreshCw,
+  CalendarDays,
+  type LucideIcon,
 } from "lucide-react";
 import { MESES_OPCOES, ANOS_OPCOES } from "@/hooks/use-florianopolis-transparencia";
 
@@ -54,158 +56,108 @@ export default function ExecutiveTabsNav({
   onAnoChange,
   loadingData = false,
 }: ExecutiveTabsNavProps) {
+  const tabs: Array<{
+    id: ExecutiveTabType;
+    label: string;
+    Icon: LucideIcon;
+    count?: number;
+    badgeClass?: string;
+  }> = [
+    { id: "overview", label: "Visão Geral", Icon: BarChart3 },
+    { id: "receitas", label: "Receitas", Icon: CircleDollarSign, count: liveReceitasCount, badgeClass: "bg-sky-200/70 text-sky-950" },
+    { id: "despesas", label: "Despesas & Empenhos", Icon: TrendingUp, count: liveDespesasCount, badgeClass: "bg-emerald-200/70 text-emerald-950" },
+    { id: "orcamento", label: "Orçamento (LOA)", Icon: Landmark, count: liveOrcamentoCount, badgeClass: "bg-amber-200/70 text-amber-950" },
+    { id: "licitacoes", label: "Licitações & Editais", Icon: Gavel, count: liveLicitacoesCount, badgeClass: "bg-purple-200/70 text-purple-950" },
+    { id: "contratos", label: "Contratos", Icon: FileText, count: liveContratosCount, badgeClass: "bg-blue-200/70 text-blue-950" },
+    { id: "pessoal", label: "Servidores & Folha", Icon: Users, count: livePessoalCount, badgeClass: "bg-teal-200/70 text-teal-950" },
+  ];
+
+  const selectClass =
+    "min-w-0 flex-1 rounded-lg border border-[#dce4e1] bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#16844a] disabled:opacity-50 sm:flex-none";
+
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-2">
-      <button
-        onClick={() => onTabChange("overview")}
-        className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
-          activeTab === "overview"
-            ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
-            : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
-        }`}
+    // Uma única linha com quebra: em telas largas abas + competência ficam lado a lado.
+    // Quando não cabe, o espaçador elástico fica no fim da linha das abas e a competência
+    // desce alinhada à esquerda (em vez de ficar "solta" à direita).
+    <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-3 border-b border-gray-200 pb-3">
+      {/* Abas: rolagem horizontal no celular; a partir de sm os botões viram itens da linha (contents) */}
+      <div
+        role="group"
+        aria-label="Seções do painel"
+        className="-mx-4 flex w-[calc(100%+2rem)] min-w-0 gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:contents"
       >
-        <BarChart3 size={15} />
-        Visão Geral
-      </button>
-
-      <button
-        onClick={() => onTabChange("receitas")}
-        className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
-          activeTab === "receitas"
-            ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
-            : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
-        }`}
-      >
-        <CircleDollarSign size={15} />
-        Receitas
-        {isFlorianopolis && liveReceitasCount > 0 && (
-          <span className="rounded-full bg-sky-200/70 px-1.5 py-0.2 text-[10px] text-sky-950 font-extrabold">
-            {liveReceitasCount}
-          </span>
-        )}
-      </button>
-
-      <button
-        onClick={() => onTabChange("despesas")}
-        className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
-          activeTab === "despesas"
-            ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
-            : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
-        }`}
-      >
-        <TrendingUp size={15} />
-        Despesas &amp; Empenhos
-        {isFlorianopolis && liveDespesasCount > 0 && (
-          <span className="rounded-full bg-emerald-200/70 px-1.5 py-0.2 text-[10px] text-emerald-950 font-extrabold">
-            {liveDespesasCount}
-          </span>
-        )}
-      </button>
-
-      <button
-        onClick={() => onTabChange("orcamento")}
-        className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
-          activeTab === "orcamento"
-            ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
-            : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
-        }`}
-      >
-        <Landmark size={15} />
-        Orçamento (LOA)
-        {isFlorianopolis && liveOrcamentoCount > 0 && (
-          <span className="rounded-full bg-amber-200/70 px-1.5 py-0.2 text-[10px] text-amber-950 font-extrabold">
-            {liveOrcamentoCount}
-          </span>
-        )}
-      </button>
-
-      <button
-        onClick={() => onTabChange("licitacoes")}
-        className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
-          activeTab === "licitacoes"
-            ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
-            : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
-        }`}
-      >
-        <Gavel size={15} />
-        Licitações &amp; Editais
-        {isFlorianopolis && liveLicitacoesCount > 0 && (
-          <span className="rounded-full bg-purple-200/70 px-1.5 py-0.2 text-[10px] text-purple-950 font-extrabold">
-            {liveLicitacoesCount}
-          </span>
-        )}
-      </button>
-
-      <button
-        onClick={() => onTabChange("contratos")}
-        className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
-          activeTab === "contratos"
-            ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
-            : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
-        }`}
-      >
-        <FileText size={15} />
-        Contratos
-        {isFlorianopolis && liveContratosCount > 0 && (
-          <span className="rounded-full bg-blue-200/70 px-1.5 py-0.2 text-[10px] text-blue-950 font-extrabold">
-            {liveContratosCount}
-          </span>
-        )}
-      </button>
-
-      <button
-        onClick={() => onTabChange("pessoal")}
-        className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-bold transition ${
-          activeTab === "pessoal"
-            ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
-            : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
-        }`}
-      >
-        <Users size={15} />
-        Servidores &amp; Folha
-        {isFlorianopolis && livePessoalCount > 0 && (
-          <span className="rounded-full bg-teal-200/70 px-1.5 py-0.2 text-[10px] text-teal-950 font-extrabold">
-            {livePessoalCount}
-          </span>
-        )}
-      </button>
+        {tabs.map(({ id, label, Icon, count = 0, badgeClass }) => {
+          const active = activeTab === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onTabChange(id)}
+              aria-current={active ? "page" : undefined}
+              className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-xs font-bold transition ${
+                active
+                  ? "bg-[#16844a] text-white shadow-md shadow-[#16844a]/20"
+                  : "bg-white text-gray-600 border border-[#dce4e1] hover:bg-gray-50"
+              }`}
+            >
+              <Icon size={15} />
+              {label}
+              {isFlorianopolis && count > 0 && badgeClass && (
+                <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-extrabold ${badgeClass}`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
 
       {isFlorianopolis && onMesChange && onAnoChange && (
-        <div className="ml-auto flex items-center gap-2 text-xs text-gray-500">
-          <span className="text-[11px] font-semibold text-gray-600">Competência:</span>
+        <>
+          {/* Espaçador elástico: empurra a competência para a direita quando tudo cabe na mesma linha */}
+          <span aria-hidden="true" className="-ml-1.5 hidden flex-1 sm:block" />
 
-          {/* Mês Select */}
-          <select
-            value={mes}
-            onChange={(e) => onMesChange(e.target.value)}
-            disabled={loadingData}
-            className="rounded-lg border border-[#dce4e1] bg-white px-2 py-1 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#16844a] disabled:opacity-50"
-            aria-label="Selecionar mês"
+          <div
+            className="flex w-full items-center gap-1.5 text-xs text-gray-500 sm:w-auto"
+            title="Competência (mês/ano)"
           >
-            {MESES_OPCOES.map((m) => (
-              <option key={m.valor} value={m.valor}>
-                {m.label}
-              </option>
-            ))}
-          </select>
-
-          {/* Ano Select */}
-          <select
-            value={ano}
-            onChange={(e) => onAnoChange(e.target.value)}
-            disabled={loadingData}
-            className="rounded-lg border border-[#dce4e1] bg-white px-2 py-1 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#16844a] disabled:opacity-50"
-            aria-label="Selecionar ano"
-          >
-            {ANOS_OPCOES.map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
-
-          {loadingData && <RefreshCw size={14} className="animate-spin text-[#16844a] shrink-0" />}
-        </div>
+            {/* Ícone no lugar do texto "Competência:" (economiza espaço); vira spinner durante o carregamento */}
+            <span className="sr-only">Competência</span>
+            {loadingData ? (
+              <RefreshCw size={15} aria-hidden="true" className="shrink-0 animate-spin text-[#16844a]" />
+            ) : (
+              <CalendarDays size={15} aria-hidden="true" className="shrink-0 text-gray-500" />
+            )}
+  
+            <select
+              value={mes}
+              onChange={(e) => onMesChange(e.target.value)}
+              disabled={loadingData}
+              className={selectClass}
+              aria-label="Selecionar mês"
+            >
+              {MESES_OPCOES.map((m) => (
+                <option key={m.valor} value={m.valor}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+  
+            <select
+              value={ano}
+              onChange={(e) => onAnoChange(e.target.value)}
+              disabled={loadingData}
+              className={selectClass}
+              aria-label="Selecionar ano"
+            >
+              {ANOS_OPCOES.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
       )}
     </div>
   );

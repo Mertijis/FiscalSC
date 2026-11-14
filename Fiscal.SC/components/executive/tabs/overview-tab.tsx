@@ -14,7 +14,6 @@ import {
   Gavel,
   FileText,
   Calculator,
-  Globe2,
   Server,
   ChevronDown,
   ChevronUp,
@@ -90,51 +89,6 @@ export default function OverviewTab({
 
   return (
     <div className="space-y-4">
-      {/* Banner de Dados Conectados para Florianópolis */}
-      {isFlorianopolis && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-[linear-gradient(90deg,#f0fbf5,#ffffff)] p-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-lg bg-emerald-100 text-emerald-800">
-              <Globe2 size={22} />
-            </div>
-            <div>
-              <strong className="text-sm text-gray-900 block">
-                Integração Total com Dados Abertos de {name} Ativa (6 Módulos)
-              </strong>
-              <p className="text-xs text-gray-600">
-                Explore receitas arrecadadas, despesas pagas, orçamento (LOA), licitações com editais em PDF, contratos e folha de servidores na competência {periodo}.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => onNavigateTab("receitas")}
-              className="rounded-lg border border-sky-300 bg-sky-50 px-3.5 py-2 text-xs font-bold text-sky-900 hover:bg-sky-100 transition"
-            >
-              Ver Receitas
-            </button>
-            <button
-              onClick={() => onNavigateTab("despesas")}
-              className="rounded-lg bg-[#16844a] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#126b3c] transition"
-            >
-              Ver Empenhos
-            </button>
-            <button
-              onClick={() => onNavigateTab("orcamento")}
-              className="rounded-lg border border-amber-300 bg-amber-50 px-3.5 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 transition"
-            >
-              Orçamento (LOA)
-            </button>
-            <button
-              onClick={() => onNavigateTab("pessoal")}
-              className="rounded-lg border border-teal-300 bg-teal-50 px-3.5 py-2 text-xs font-bold text-teal-900 hover:bg-teal-100 transition"
-            >
-              Servidores &amp; Folha
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Row 1: Area Distribution (Expanded) & Featured Expenses */}
       <section className="grid gap-4 grid-cols-1 lg:grid-cols-12">
         {/* Distribuição por Área (Mais amplo e legível) */}
@@ -242,8 +196,8 @@ export default function OverviewTab({
         </article>
 
         {/* Despesas em Destaque */}
-        <article className="lg:col-span-5 rounded-xl border border-[#e0e7e4] bg-white p-6 shadow-sm flex flex-col justify-between min-w-0">
-          <div>
+        <article className="lg:col-span-5 rounded-xl border border-[#e0e7e4] bg-white p-6 shadow-sm flex flex-col min-w-0">
+          <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex justify-between items-center">
               <h2 className="text-sm font-extrabold text-gray-900">Despesas em Destaque</h2>
               <button
@@ -263,7 +217,10 @@ export default function OverviewTab({
                 <span className="text-[10px] text-gray-400">Consultando e-Pública</span>
               </div>
             ) : isFlorianopolis ? (
-              <div className="mt-4 grid gap-2.5 max-h-[380px] overflow-y-auto pr-1.5">
+              // Em lg+ a lista ocupa todo o espaço restante do card (altura definida pelo card vizinho,
+              // via absolute) e rola internamente; no celular mantém a altura máxima fixa.
+              <div className="mt-4 lg:relative lg:min-h-[320px] lg:flex-1">
+              <div className="flex max-h-[380px] flex-col gap-2.5 overflow-y-auto pr-1.5 lg:absolute lg:inset-0 lg:max-h-none">
                 {liveDespesas.slice(0, 15).map((d, idx) => {
                   const itemKey = d.id || `overview-despesa-${d.numeroEmpenho}-${idx}`;
                   const isExpanded = !!expandedOverview[itemKey];
@@ -363,6 +320,7 @@ export default function OverviewTab({
                   </p>
                 )}
               </div>
+              </div>
             ) : (
               <div className="mt-4 grid gap-3">
                 {mockSpending.map((item) => (
@@ -413,7 +371,7 @@ export default function OverviewTab({
       {/* Row 2: Revenue Evolution and Contracts Summary */}
       <section className="grid gap-4 grid-cols-1 lg:grid-cols-2 min-w-0">
         {/* Arrecadação Mensal de Receitas */}
-        <article className="rounded-xl border border-[#e0e7e4] bg-white p-5 shadow-sm min-w-0 flex flex-col justify-between">
+        <article className="rounded-xl border border-[#e0e7e4] bg-white p-5 shadow-sm min-w-0 flex flex-col">
           <div className="flex justify-between items-center">
             <h2 className="text-sm font-extrabold text-gray-900">
               {isFlorianopolis
@@ -441,7 +399,8 @@ export default function OverviewTab({
                 </span>
               </div>
             ) : (
-              <div className="mt-4 space-y-3">
+              // Resumo fixo no topo; a lista de rubricas preenche o restante do card em lg+
+              <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
                 <div className="grid gap-2.5 grid-cols-1 sm:grid-cols-2">
                   <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 min-w-0">
                     <span className="text-[10px] font-bold text-emerald-800 block uppercase">
@@ -467,7 +426,8 @@ export default function OverviewTab({
                   </div>
                 </div>
 
-                <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1.5">
+                <div className="lg:relative lg:min-h-[260px] lg:flex-1">
+                <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1.5 lg:absolute lg:inset-0 lg:max-h-none">
                   {liveReceitas.slice(0, 15).map((rec) => (
                     <div
                       key={rec.id}
@@ -491,6 +451,7 @@ export default function OverviewTab({
                       Nenhuma receita encontrada no período.
                     </p>
                   )}
+                </div>
                 </div>
               </div>
             )
