@@ -4,6 +4,7 @@ import { fetchCityData } from '../services/cityApiService';
 import { compileDashboardData } from '../services/dashboardService';
 import { io } from '../socket/io';
 import { setCache } from '../redis/client';
+import { toErrorPayload } from '../errors';
 
 export const cityQueues: Record<string, Queue> = {};
 
@@ -41,7 +42,7 @@ export const createCityWorker = (cityId: string) => {
       } catch (error: any) {
         console.error(`[Worker ${cityId}] Erro ao compilar dashboard:`, error.message);
         if (io && userId) {
-          io.to(userId).emit('dashboard_error', { cacheKey, error: error.message });
+          io.to(userId).emit('dashboard_error', { cacheKey, ...toErrorPayload(error) });
         }
         throw error;
       }
@@ -65,7 +66,7 @@ export const createCityWorker = (cityId: string) => {
     } catch (error: any) {
       console.error(`[Worker ${cityId}] Erro ao buscar dados:`, error.message);
       if (io) {
-        io.to(userId).emit('query_error', { cacheKey, error: error.message });
+        io.to(userId).emit('query_error', { cacheKey, ...toErrorPayload(error) });
       }
       throw error;
     }

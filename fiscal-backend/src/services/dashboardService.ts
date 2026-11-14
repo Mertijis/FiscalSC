@@ -1,6 +1,7 @@
 import { fetchCityData } from './cityApiService';
 import { getCityAdapter } from '../adapters';
 import { aggregateReceitasTrimestre, ReceitaTrimestreResultado } from './aggregationService';
+import { MunicipioIndisponivelError } from '../errors';
 
 export type MovimentoDespesa = {
   dataMovimento?: string;
@@ -647,7 +648,19 @@ export async function compileDashboardData(
     });
 
     // Aguarda a Fase Rápida primeiro
-    const [resReceitas, resDespesas, resContratos, resOrcamento, resPessoal] = await fastPromise;
+    const fastResults = await fastPromise;
+    const [resReceitas, resDespesas, resContratos, resOrcamento, resPessoal] = fastResults;
+
+    // Se TODAS as consultas falharam (ex: portal da prefeitura fora do ar / HTTP 502), não devolve
+    // um pacote "vazio com sucesso" — isso seria gravado no Redis por 24h e mascararia a indisponibilidade.
+    const failures = fastResults.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+    if (failures.length === fastResults.length) {
+      const motivo = failures[0]?.reason?.message || 'erro desconhecido';
+      throw new MunicipioIndisponivelError(cityId, cityName, motivo);
+    }
+    failures.forEach((f) =>
+      console.warn(`[Dashboard Warning] Módulo de ${cityName} falhou:`, f.reason?.message)
+    );
 
     const rawReceitas = resReceitas.status === 'fulfilled' ? resReceitas.value?.registros || [] : [];
     const rawDespesas = resDespesas.status === 'fulfilled' ? resDespesas.value?.registros || [] : [];

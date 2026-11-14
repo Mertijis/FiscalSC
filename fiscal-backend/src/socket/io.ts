@@ -16,8 +16,11 @@ export function initSocket(server: Server) {
     console.log(`Cliente conectado: ${socket.id}`);
     
     // O cliente vai emitir 'join' passando um ID único para criar uma sala privada
-    socket.on('join', (userId: string) => {
+    // O ack confirma ao cliente que ele já está na sala, evitando perder eventos emitidos
+    // antes do join (ex: erro rápido da prefeitura em ~100ms)
+    socket.on('join', (userId: string, ack?: () => void) => {
       socket.join(userId);
+      if (typeof ack === 'function') ack();
       console.log(`Socket ${socket.id} entrou na sala ${userId}`);
     });
 

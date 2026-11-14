@@ -12,6 +12,7 @@ import LicitacoesTab from "../tabs/licitacoes-tab";
 import ContratosTab from "../tabs/contratos-tab";
 import PessoalTab from "../tabs/pessoal-tab";
 import ExecutiveFooter from "../footer/executive-footer";
+import MunicipalityErrorAlert from "../alerts/municipality-error-alert";
 import { useFlorianopolisTransparencia } from "@/hooks/use-florianopolis-transparencia";
 import { useStudy } from "@/components/providers/study-provider";
 
@@ -110,6 +111,8 @@ export default function MunicipalityExecutiveView({
     dynamicConic,
     formatCurrency,
     dashboardSource,
+    dashboardError,
+    retry,
   } = useFlorianopolisTransparencia(isFlorianopolis, slug);
 
   return (
@@ -149,6 +152,18 @@ export default function MunicipalityExecutiveView({
         loadingData={loadingData}
       />
 
+      {/* Erro no servidor do município: substitui o conteúdo das abas para não exibir valores zerados */}
+      {dashboardError && (
+        <MunicipalityErrorAlert
+          name={name}
+          error={dashboardError}
+          onRetry={retry}
+          loading={loadingData}
+        />
+      )}
+
+      {!dashboardError && (
+      <>
       {/* TAB 1: VISÃO GERAL */}
       {activeTab === "overview" && (
         <div className="space-y-4">
@@ -279,6 +294,9 @@ export default function MunicipalityExecutiveView({
           totalFolhaBruta={totalFolhaBruta}
           formatCurrency={formatCurrency}
         />
+      )}
+
+      </>
       )}
 
       {/* Footer Banner

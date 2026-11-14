@@ -212,9 +212,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <p className="px-6 pb-5 pt-6 text-xs leading-5 text-white/65">
-          Projeto de TIC
+          Fiscal SC
           <br />
-          versão 0.1 (dev)
+          versão 1.0.0
         </p>
       </aside>
 

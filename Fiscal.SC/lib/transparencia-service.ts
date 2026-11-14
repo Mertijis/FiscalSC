@@ -203,10 +203,28 @@ export interface DashboardPackage {
   timestamp?: string;
 }
 
+/**
+ * Códigos estáveis de erro. Os dois primeiros vêm do fiscal-backend (campo `code`);
+ * BACKEND_INDISPONIVEL e TEMPO_ESGOTADO são gerados no próprio frontend.
+ */
+export type DashboardErrorCode =
+  | "MUNICIPIO_INDISPONIVEL"
+  | "ERRO_INTERNO"
+  | "BACKEND_INDISPONIVEL"
+  | "TEMPO_ESGOTADO";
+
+const BACKEND_ERROR_CODES: DashboardErrorCode[] = ["MUNICIPIO_INDISPONIVEL", "ERRO_INTERNO"];
+
+export function parseBackendErrorCode(code: unknown): DashboardErrorCode {
+  return BACKEND_ERROR_CODES.includes(code as DashboardErrorCode)
+    ? (code as DashboardErrorCode)
+    : "ERRO_INTERNO";
+}
+
 export type DashboardResponse =
   | { status: 200; data: DashboardPackage; source: "cache" | "worker" | "live" }
   | { status: 202; cacheKey: string; message: string }
-  | { status: 500; error: string };
+  | { status: 500; error: string; code: DashboardErrorCode };
 
 export function getWorkerUrl(): string {
   if (typeof window !== "undefined") {
@@ -264,11 +282,14 @@ export async function fetchExecutiveDashboard(
     return {
       status: 500,
       error: errJson.error || `Worker respondeu com status ${res.status}`,
+      code: parseBackendErrorCode(errJson.code),
     };
   } catch (err: unknown) {
+    // fetch só lança em falha de rede: o fiscal-backend não está acessível
     return {
       status: 500,
       error: err instanceof Error ? err.message : String(err),
+      code: "BACKEND_INDISPONIVEL",
     };
   }
 }

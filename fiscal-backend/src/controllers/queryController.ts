@@ -4,6 +4,7 @@ import { getCityQueue } from '../queues/cityQueue';
 import { fetchCityData, buildDeterministicHash } from '../services/cityApiService';
 import { aggregateReceitasTrimestre } from '../services/aggregationService';
 import { compileDashboardData } from '../services/dashboardService';
+import { toErrorPayload } from '../errors';
 
 export async function handleCityQuery(req: Request, res: Response): Promise<any> {
   const { cityId, queryParams } = req.body;
@@ -134,7 +135,10 @@ export async function handleDashboardQuery(req: Request, res: Response): Promise
       cacheKey,
     });
   } catch (err: any) {
-    console.error('[Dashboard Error]', err);
-    return res.status(500).json({ error: err.message });
+    console.error('[Dashboard Error]', err.message);
+    const payload = toErrorPayload(err);
+    // 502 Bad Gateway: a falha é do servidor upstream (prefeitura), não do fiscal-backend
+    const status = payload.code === 'MUNICIPIO_INDISPONIVEL' ? 502 : 500;
+    return res.status(status).json(payload);
   }
 }
