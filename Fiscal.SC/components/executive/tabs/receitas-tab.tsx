@@ -146,13 +146,13 @@ export default function ReceitasTab({
 
         <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-3.5">
           <span className="text-[10px] font-bold uppercase tracking-wider text-blue-800 block">
-            Previsão Lançada no Período (LOA)
+            Movimentos de previsão no mês
           </span>
           <strong className="mt-1 block text-lg font-black text-blue-950">
             {formatCurrency(totalReceitasPrevistas)}
           </strong>
           <span className="text-[10px] text-blue-700">
-            Estimativa orçamentária registrada
+            Movimentos de previsão lançados no mês
           </span>
         </div>
 

@@ -86,7 +86,7 @@ export default function DespesasTab({
             Empenhos e Liquidações Oficiais — {name}
           </h3>
           <p className="text-xs text-gray-500 break-words">
-            Dados extraídos ao vivo do Portal da Transparência de {name} para a competência {periodo}.
+            Dados oficiais extraídos do Portal da Transparência de {name} para a competência {periodo}.
           </p>
         </div>
 
@@ -187,10 +187,10 @@ export default function DespesasTab({
                       {formatCurrency(d.valorPago ?? d.valor)}
                     </span>
                     <small className="block text-[10px] text-gray-400 break-words max-w-[240px] sm:max-w-none">
-                      {(d.valorEmpenhado ?? 0) > 0 && (
+                      {(d.valorEmpenhado ?? 0) !== 0 && (
                         <span>Emp: {formatCurrency(d.valorEmpenhado || 0)} </span>
                       )}
-                      {(d.valorLiquidado ?? 0) > 0 && (
+                      {(d.valorLiquidado ?? 0) !== 0 && (
                         <span>• Liq: {formatCurrency(d.valorLiquidado || 0)}</span>
                       )}
                       {(d.valorEmpenhado ?? 0) === 0 && (d.valorLiquidado ?? 0) === 0 && (
@@ -243,12 +243,12 @@ export default function DespesasTab({
                         Histórico de Movimentos ({movs.length})
                       </span>
                       <div className="flex flex-wrap items-center gap-3 text-[10px] text-gray-500 font-medium">
-                        {(d.valorEmpenhado ?? 0) > 0 && (
+                        {(d.valorEmpenhado ?? 0) !== 0 && (
                           <span>
                             Empenhado: <strong className="text-gray-700">{formatCurrency(d.valorEmpenhado || 0)}</strong>
                           </span>
                         )}
-                        {(d.valorLiquidado ?? 0) > 0 && (
+                        {(d.valorLiquidado ?? 0) !== 0 && (
                           <span>
                             Liquidado: <strong className="text-blue-700">{formatCurrency(d.valorLiquidado || 0)}</strong>
                           </span>

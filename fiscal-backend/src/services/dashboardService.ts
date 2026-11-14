@@ -288,6 +288,41 @@ export function normalizeReceitas(registros: any[], cityName = 'Florianópolis')
   });
 }
 
+export type ClassificacaoMovimento = {
+  alvo: 'empenhado' | 'liquidado' | 'pago' | null;
+  sinal: 1 | -1;
+};
+
+/**
+ * Classificação única dos movimentos de execução da despesa (usada em normalizeDespesas e
+ * normalizeDespesaOrcamentaria). Os valores chegam positivos da API; estornos, anulações e
+ * cancelamentos subtraem do total correspondente.
+ */
+export function classificarMovimento(tipoMovimento: string): ClassificacaoMovimento {
+  const tipo = (tipoMovimento || '').toLowerCase();
+  const sinal: 1 | -1 =
+    tipo.includes('estorno') || tipo.includes('anula') || tipo.includes('cancela') ? -1 : 1;
+
+  // 1. Etapas intermediárias, retenções e restos a pagar fora do fluxo do mês: ignorados
+  if (
+    tipo.includes('em liquidação') ||
+    tipo.includes('em liquidacao') ||
+    tipo.includes('retenção') ||
+    tipo.includes('retencao') ||
+    tipo.includes('cancelamento de restos a pagar') ||
+    tipo.includes('inscrição de restos a pagar') ||
+    tipo.includes('inscricao de restos a pagar')
+  ) {
+    return { alvo: null, sinal };
+  }
+
+  if (tipo.includes('pagamento')) return { alvo: 'pago', sinal };
+  if (tipo.includes('liquidação') || tipo.includes('liquidacao')) return { alvo: 'liquidado', sinal };
+  if (tipo.includes('emissão de empenho') || tipo === 'empenho') return { alvo: 'empenhado', sinal: 1 };
+  if (tipo.includes('anulação de empenho')) return { alvo: 'empenhado', sinal: -1 };
+  return { alvo: null, sinal };
+}
+
 export function normalizeDespesas(registros: any[]): DespesaItem[] {
   if (!Array.isArray(registros)) return [];
 
@@ -306,38 +341,22 @@ export function normalizeDespesas(registros: any[]): DespesaItem[] {
     let tipoPagamentoEncontrado: string | null = null;
 
     for (const m of movimentos) {
-      const tipo = (m.tipoMovimento || '').toLowerCase();
-      const val = m.valorMovimento;
+      const { alvo, sinal } = classificarMovimento(m.tipoMovimento || '');
+      const val = sinal * m.valorMovimento;
 
-      if (tipo.includes('pagamento')) {
-        if (tipo.includes('estorno') || tipo.includes('anula') || tipo.includes('cancela')) {
-          valorPago -= val;
-        } else {
-          valorPago += val;
-          tipoPagamentoEncontrado = m.tipoMovimento || 'Pagamento de empenho';
-        }
-      } else if (tipo.includes('liquidação') || tipo.includes('liquidacao')) {
-        if (tipo.includes('estorno') || tipo.includes('anula') || tipo.includes('cancela')) {
-          valorLiquidado -= val;
-        } else if (!tipo.includes('empenho em liquidação')) {
-          valorLiquidado += val;
-        } else {
-          valorEmpenhado += val;
-        }
-      } else if (
-        tipo.includes('emissão de empenho') ||
-        tipo.includes('inscrição de restos a pagar') ||
-        tipo === 'empenho'
-      ) {
+      if (alvo === 'pago') {
+        valorPago += val;
+        if (sinal === 1) tipoPagamentoEncontrado = m.tipoMovimento || 'Pagamento de empenho';
+      } else if (alvo === 'liquidado') {
+        valorLiquidado += val;
+      } else if (alvo === 'empenhado') {
         valorEmpenhado += val;
-      } else if (tipo.includes('anulação de empenho') || tipo.includes('cancelamento')) {
-        valorEmpenhado -= val;
       }
     }
 
-    valorPago = Math.max(0, Math.round(valorPago * 100) / 100);
-    valorLiquidado = Math.max(0, Math.round(valorLiquidado * 100) / 100);
-    valorEmpenhado = Math.max(0, Math.round(valorEmpenhado * 100) / 100);
+    valorPago = Math.round(valorPago * 100) / 100;
+    valorLiquidado = Math.round(valorLiquidado * 100) / 100;
+    valorEmpenhado = Math.round(valorEmpenhado * 100) / 100;
 
     const ultimoMov = movimentos[movimentos.length - 1];
     const primeiroMov = movimentos[0];
@@ -526,18 +545,12 @@ export function normalizeDespesaOrcamentaria(registros: any[], cityName = 'Flori
     let valorPago = 0;
 
     for (const m of movimentos) {
-      const tipo = (m.tipoMovimento || '').toLowerCase();
-      if (tipo.includes('emissão de empenho') || tipo === 'empenho') {
-        valorEmpenhado += m.valorMovimento;
-      } else if (tipo.includes('liquidação')) {
-        valorLiquidado += m.valorMovimento;
-      } else if (tipo.includes('pagamento')) {
-        valorPago += m.valorMovimento;
-      }
-    }
+      const { alvo, sinal } = classificarMovimento(m.tipoMovimento || '');
+      const val = sinal * m.valorMovimento;
 
-    if (valorEmpenhado === 0 && movimentos.length > 0) {
-      valorEmpenhado = movimentos[0].valorMovimento;
+      if (alvo === 'pago') valorPago += val;
+      else if (alvo === 'liquidado') valorLiquidado += val;
+      else if (alvo === 'empenhado') valorEmpenhado += val;
     }
 
     return {
@@ -563,11 +576,15 @@ export function normalizeDespesaOrcamentaria(registros: any[], cityName = 'Flori
   });
 }
 
-function calculateAreasDistrib(despesas: DespesaItem[]): {
+export function calculateAreasDistrib(despesas: DespesaItem[]): {
   total: number;
+  totalPago: number;
   areas: string[];
   distribuicao: AreaDistribItem[];
 } {
+  // Total exibido: soma real de valorPago (com estornos líquidos negativos), sem piso em zero.
+  const totalPago = Math.round(despesas.reduce((acc, d) => acc + d.valorPago, 0) * 100) / 100;
+  // Piso em zero só para o gráfico por área, para que percentuais e fatias nunca fiquem negativos.
   const total = despesas.reduce((acc, d) => acc + Math.max(0, d.valor), 0);
   const map = new Map<string, number>();
 
@@ -589,7 +606,7 @@ function calculateAreasDistrib(despesas: DespesaItem[]): {
     color: colors[idx % colors.length],
   }));
 
-  return { total, areas, distribuicao };
+  return { total, totalPago, areas, distribuicao };
 }
 
 // In-Flight Promise Map para evitar compilações concorrentes duplicadas (Thundering Herd)
@@ -673,7 +690,7 @@ export async function compileDashboardData(
     const contratos = normalizeContratos(rawContratos, cityName);
     const despesaOrcamentaria = normalizeDespesaOrcamentaria(rawOrcamento, cityName);
     let pessoal = normalizePessoal(rawPessoal, periodo, cityName);
-    const { total, areas, distribuicao } = calculateAreasDistrib(despesas);
+    const { totalPago, areas, distribuicao } = calculateAreasDistrib(despesas);
 
     const totalReceitasArrecadadas =
       Math.round(receitas.reduce((acc, r) => acc + Math.max(0, r.valorArrecadado), 0) * 100) / 100;
@@ -725,8 +742,8 @@ export async function compileDashboardData(
           totalReceitasArrecadadas,
           totalReceitasPrevistas,
           totalRegistrosReceitas: receitas.length,
-          totalDespesasReais: total,
-          totalDespesasFormatado: formatCurrencyBRL(total),
+          totalDespesasReais: totalPago,
+          totalDespesasFormatado: formatCurrencyBRL(totalPago),
           totalRegistrosDespesas: despesas.length,
           totalLicitacoes: 0,
           totalContratos: contratos.length,
@@ -770,8 +787,8 @@ export async function compileDashboardData(
         totalReceitasArrecadadas,
         totalReceitasPrevistas,
         totalRegistrosReceitas: receitas.length,
-        totalDespesasReais: total,
-        totalDespesasFormatado: formatCurrencyBRL(total),
+        totalDespesasReais: totalPago,
+        totalDespesasFormatado: formatCurrencyBRL(totalPago),
         totalRegistrosDespesas: despesas.length,
         totalLicitacoes: licitacoes.length,
         totalContratos: contratos.length,

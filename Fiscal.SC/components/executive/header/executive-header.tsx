@@ -50,7 +50,7 @@ export default function ExecutiveHeader({
           {isFlorianopolis ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
               <Globe2 size={13} className="text-emerald-700" />
-              Dados Oficiais em Tempo Real (6 Módulos • Portal e-Pública)
+              Dados oficiais do Portal e-Pública (6 Módulos)
             </span>
           ) : kind === "municipio" ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">

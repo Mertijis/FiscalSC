@@ -50,12 +50,12 @@ export const missions: Mission[] = [
     abaExecutivo: "receitas",
     acaoTexto: "Abrir Receitas de Florianópolis",
     dicaContexto:
-      "Na contabilidade pública (Lei nº 4.320/64), a Previsão de Receita é a estimativa anual aprovada na Lei Orçamentária (LOA), enquanto a Arrecadação Líquida representa os recursos que efetivamente ingressaram nos cofres municipais no mês, já descontadas restituições e deduções como o FUNDEB.",
+      "Na contabilidade pública (Lei nº 4.320/64), o card de previsão mostra os movimentos de previsão de receita lançados no mês consultado, e não o saldo anual da LOA, enquanto a Arrecadação Líquida representa os recursos que efetivamente ingressaram nos cofres municipais no mês, já descontadas restituições e deduções como o FUNDEB.",
     pergunta:
       "Qual indicador da aba de Receitas mostra o dinheiro que realmente entrou nos cofres da Prefeitura no mês selecionado?",
     opcoes: [
       "Valor Arrecadado (Receita Arrecadada Líquida)",
-      "Previsão Lançada no Período (LOA)",
+      "Movimentos de previsão no mês",
       "Reconhecimento contábil sem ingresso bancário",
     ],
     correta: 0,

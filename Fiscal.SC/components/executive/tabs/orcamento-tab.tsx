@@ -93,7 +93,7 @@ export default function OrcamentoTab({
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-extrabold text-gray-900 flex items-center gap-2">
             <Landmark className="text-amber-600 shrink-0" size={20} />
-            Despesa Orçamentária &amp; Programas (LOA) — {name}
+            Despesa Orçamentária &amp; Programas — {name}
           </h3>
           <p className="text-xs text-gray-500">
             Classificação funcional-programática, ações governamentais e execução das dotações na competência {periodo}.
@@ -130,7 +130,7 @@ export default function OrcamentoTab({
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3.5">
           <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
-            Total Empenhado nas Dotações
+            Total Empenhado no Período
           </span>
           <strong className="mt-1 block text-lg font-black text-amber-950">
             {formatCurrency(totalEmpenhadoOrcamento)}
@@ -154,7 +154,7 @@ export default function OrcamentoTab({
 
         <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3.5">
           <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
-            Total Efetivamente Pago
+            Total Pago no Período
           </span>
           <strong className="mt-1 block text-lg font-black text-emerald-950">
             {formatCurrency(totalPagoOrcamento)}
@@ -221,7 +221,7 @@ export default function OrcamentoTab({
                   <div className="grid grid-cols-3 sm:flex sm:items-center gap-3 text-left sm:text-right shrink-0">
                     <div>
                       <small className="block text-[9px] uppercase font-bold text-gray-400">
-                        Empenhado
+                        Empenhado no mês
                       </small>
                       <span className="text-xs font-extrabold text-amber-700">
                         {formatCurrency(item.valorEmpenhado)}
@@ -229,7 +229,7 @@ export default function OrcamentoTab({
                     </div>
                     <div>
                       <small className="block text-[9px] uppercase font-bold text-gray-400">
-                        Liquidado
+                        Liquidado no mês
                       </small>
                       <span className="text-xs font-extrabold text-blue-700">
                         {formatCurrency(item.valorLiquidado)}
@@ -237,7 +237,7 @@ export default function OrcamentoTab({
                     </div>
                     <div>
                       <small className="block text-[9px] uppercase font-bold text-gray-400">
-                        Pago
+                        Pago no mês
                       </small>
                       <span className="text-xs font-extrabold text-emerald-700">
                         {formatCurrency(item.valorPago)}
