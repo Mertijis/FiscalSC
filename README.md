@@ -27,7 +27,7 @@ O conteúdo é organizado em nove missões educativas. Cada missão orienta a le
 
 A aplicação tem duas condições, **gamificada** e **neutra**, com o mesmo conteúdo. Na condição neutra, os avisos de XP não são exibidos. As duas condições foram implementadas para permitir comparações em estudos futuros.
 
-**Contexto:** produto do Trabalho de Integração Curricular (TIC 2) do curso de Design de Jogos da UNIVALI.
+**Contexto:** produto do Trabalho de Iniciação Científica do curso de Design de Jogos da UNIVALI.
 **Orientador:** Dennis Kerr Coelho.
 **Autor:** Victor Fineto Silva.
 
